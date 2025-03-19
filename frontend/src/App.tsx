@@ -3,9 +3,10 @@ import { getSuperTokensRoutesForReactRouterDom } from "supertokens-auth-react/ui
 import { SessionAuth } from "supertokens-auth-react/recipe/session";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import * as ReactRouter from "react-router-dom";
-import Dashboard from "./Dashboard";
+import Dashboard from "./components/Dashboard";
+import RoomDetail from "./components/roomDetail";
 import { PreBuiltUIList, SuperTokensConfig, ComponentWrapper } from "./config";
-import Home from "./Home";
+import Home from "./components/Home";
 
 // Initialize SuperTokens - ideally in the global
 SuperTokens.init(SuperTokensConfig);
@@ -48,6 +49,13 @@ function App() {
                                         </SessionAuth>
                                     }
                                 />
+                                <Route 
+                                path= "/room/:roomId"
+                                element={
+                                    <SessionAuth>
+                                    <RoomDetail/>
+                                    </SessionAuth>
+                                }/>
                             </Routes>
                         </div>
                     </BrowserRouter>

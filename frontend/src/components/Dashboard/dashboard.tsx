@@ -4,7 +4,7 @@ import {
   Toolbar, 
   IconButton, 
   Typography, 
-  InputBase, 
+  //InputBase, 
   Badge, 
   Drawer, 
   List, 
@@ -27,14 +27,15 @@ import {
 } from '@mui/material';
 import { 
   Menu as MenuIcon, 
-  Search as SearchIcon, 
+  //Search as SearchIcon, 
   Notifications as NotificationsIcon, 
   Dashboard as DashboardIcon, 
   Group as GroupIcon, 
   Payment as PaymentIcon, 
   Settings as SettingsIcon,
   //MoreVert as MoreVertIcon,
-  ExitToApp as ExitToAppIcon
+  ExitToApp as ExitToAppIcon,
+  Add as AddIcon,
 } from '@mui/icons-material';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
@@ -48,21 +49,30 @@ interface NavItem {
   }
 const FlixshareApp: React.FC = () => {
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [profileAnchorEl, setProfileAnchorEl] = useState<null | HTMLElement>(null);
+    const [addAnchorEl, setAddAnchorEl] = useState<null | HTMLElement>(null);
     const [currentPage, setCurrentPage] = useState<string>('Dashboard');
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     
     const handleDrawerToggle = (): void => {
       setDrawerOpen(!drawerOpen);
     };
+
+    const handleAddClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAddAnchorEl(event.currentTarget);
+      };
     
     const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>): void => {
-      setAnchorEl(event.currentTarget);
+      setProfileAnchorEl(event.currentTarget);
     };
     
     const handleProfileMenuClose = (): void => {
-      setAnchorEl(null);
+      setProfileAnchorEl(null);
     };
+    
+    const handleClose = () => {
+        setAddAnchorEl(null);
+      };
     
     const handlePageChange = (page: string): void => {
       setCurrentPage(page);
@@ -70,6 +80,15 @@ const FlixshareApp: React.FC = () => {
         setDrawerOpen(false);
       }
     };
+    const handleJoinRoom = () => {
+        // Add your join room logic here
+        //handleClose();
+      };
+    
+      const handleCreateRoom = () => {
+        // Add your create room logic here
+        //handleClose();
+      };
   
     // Navigation items
     const navItems: NavItem[] = [
@@ -100,18 +119,33 @@ const FlixshareApp: React.FC = () => {
               </Typography>
               
               <Box sx={{ flexGrow: 1 }} />
-              
-              {/* Search Bar */}
-              <Box sx={{ position: 'relative', bgcolor: 'secondary.main', borderRadius: 1, ml: 0, mr: 2, my: 1, width: { xs: '50%', md: '35%' } }}>
-                <Box sx={{ position: 'absolute', display: 'flex', alignItems: 'center', pl: 1, height: '100%' }}>
-                  <SearchIcon />
-                </Box>
-                <InputBase
-                  placeholder="Search rooms…"
-                  sx={{ pl: 5, pr: 1, py: 1, width: '100%' }}
-                />
-              </Box>
-              
+
+                {/* Add Room Button */}
+            <IconButton
+              color="primary"
+              aria-label="add room"
+              onClick={handleAddClick}
+              sx={{ ml: 2 }}
+            >
+              <AddIcon />
+            </IconButton>
+            <Menu
+              anchorEl={addAnchorEl}
+              open={Boolean(addAnchorEl)}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+            >
+              <MenuItem onClick={handleJoinRoom}>Join Room</MenuItem>
+              <MenuItem onClick={handleCreateRoom}>Create New Room</MenuItem>
+            </Menu>
+
               {/* Notification Icon */}
               <IconButton color="inherit">
                 <Badge badgeContent={3} color="error">
@@ -134,9 +168,9 @@ const FlixshareApp: React.FC = () => {
               {/* Profile Dropdown Menu */}
               <Menu
                 id="profile-menu"
-                anchorEl={anchorEl}
+                anchorEl={profileAnchorEl}
                 keepMounted
-                open={Boolean(anchorEl)}
+                open={Boolean(profileAnchorEl)}
                 onClose={handleProfileMenuClose}
               >
                 <MenuItem onClick={handleProfileMenuClose}>Profile</MenuItem>
