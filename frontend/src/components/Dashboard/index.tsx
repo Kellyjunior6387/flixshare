@@ -1,7 +1,7 @@
-import { useSessionContext } from "supertokens-auth-react/recipe/session";
+
 import { signOut } from "supertokens-auth-react/recipe/session";
 //import { recipeDetails } from "../config";
-import {  SignOutIcon } from "../assets/images";
+import {  SignOutIcon } from "../../assets/images";
 import { useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 import FlixshareApp from "./dashboard";
@@ -15,12 +15,9 @@ export interface Link {
 }
 
 export default function Dashboard() {
-    const sessionContext = useSessionContext();
+    
     const navigate = useNavigate();
 
-    if (sessionContext.loading === true) {
-        return null;
-    }
 
     async function logoutClicked() {
         await signOut();

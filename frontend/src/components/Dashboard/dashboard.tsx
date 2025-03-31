@@ -40,7 +40,10 @@ import {
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
 import roomsData from './data';
-
+import CreateRoomForm, { RoomFormData } from '../Forms/CreateRoomForm';
+import axios from 'axios'
+import {logout} from '../Auth/tokenManager'
+import { useNavigate } from 'react-router-dom';
 
 
 interface NavItem {
@@ -53,6 +56,8 @@ const FlixshareApp: React.FC = () => {
     const [addAnchorEl, setAddAnchorEl] = useState<null | HTMLElement>(null);
     const [currentPage, setCurrentPage] = useState<string>('Dashboard');
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [openCreateDialog, setOpenCreateDialog] = useState(false);
+    const navigate = useNavigate()
     
     const handleDrawerToggle = (): void => {
       setDrawerOpen(!drawerOpen);
@@ -80,15 +85,30 @@ const FlixshareApp: React.FC = () => {
         setDrawerOpen(false);
       }
     };
-    const handleJoinRoom = () => {
-        // Add your join room logic here
-        //handleClose();
-      };
-    
-      const handleCreateRoom = () => {
-        // Add your create room logic here
-        //handleClose();
-      };
+    const handleCreateRoom = () => {
+      setOpenCreateDialog(true);
+      handleClose();
+    };
+    const handleCloseDialog = () => {
+      setOpenCreateDialog(false);
+    };
+    const handleLogOut = () => {
+        logout();
+        navigate('/auth/login')
+
+    }
+    const handleCreateRoomSubmit = async (roomData: RoomFormData) => {
+      console.log('New Room:', roomData);
+      try {
+        const response = await axios.post('http://127.0.0.1:8080/room/create/', roomData);
+        console.log('Room created successfully:', response.data);
+        handleCloseDialog();
+        // Optionally, refresh the rooms list or show a success message
+      } catch (error) {
+        console.error('Error creating room:', error);
+        // Optionally, show an error message to the user
+      }
+    };
   
     // Navigation items
     const navItems: NavItem[] = [
@@ -142,9 +162,14 @@ const FlixshareApp: React.FC = () => {
                 horizontal: 'right',
               }}
             >
-              <MenuItem onClick={handleJoinRoom}>Join Room</MenuItem>
+              <MenuItem>Join Room</MenuItem>
               <MenuItem onClick={handleCreateRoom}>Create New Room</MenuItem>
             </Menu>
+            <CreateRoomForm
+                  open={openCreateDialog}
+                  onClose={handleCloseDialog}
+                  onSubmit={handleCreateRoomSubmit}
+             />
 
               {/* Notification Icon */}
               <IconButton color="inherit">
@@ -176,9 +201,13 @@ const FlixshareApp: React.FC = () => {
                 <MenuItem onClick={handleProfileMenuClose}>Profile</MenuItem>
                 <MenuItem onClick={handleProfileMenuClose}>Account Settings</MenuItem>
                 <Divider />
-                <MenuItem onClick={handleProfileMenuClose}>
+                <MenuItem onClick={() => {
+                  handleLogOut();
+                  handleProfileMenuClose();
+                }}>
                   <ListItemIcon>
-                    <ExitToAppIcon fontSize="small" />
+                    <ExitToAppIcon 
+                    fontSize="small" />
                   </ListItemIcon>
                   Logout
                 </MenuItem>
