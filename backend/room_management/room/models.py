@@ -26,16 +26,35 @@ class Room(models.Model):
     due_date = models.DateField()  # Next billing date
 
     def __str__(self):
-        return self.name
+        return str(self.room_id)
     
 class RoomMember(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='members')
-    user_id = models.CharField(max_length=255)  # Supertokens user ID for the member
+    MEMBER_ROLES = [
+        ('owner', 'Owner'),
+        ('member', 'Member'),
+    ]
+
+    PAYMENT_STATUS = [
+        ('pending', 'Pending'),
+        ('paid', 'Paid'),
+        ('overdue', 'Overdue'),
+    ]
+
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='members', db_index=True)
+    user_id = models.UUIDField(db_index=True)  # Changed to UUIDField since we're using UUIDs
     join_date = models.DateTimeField(auto_now_add=True)
-    role = models.CharField(max_length=50, default='member')
+    role = models.CharField(max_length=20, choices=MEMBER_ROLES, default='member')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default='pending')
+    last_payment_date = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
-        unique_together = ('room', 'user_id')  # Ensure a user is not added twice to the same room
+        unique_together = ('room', 'user_id')
+        indexes = [
+            models.Index(fields=['user_id', 'room']),
+            models.Index(fields=['payment_status']),
+        ]
+        db_table = 'room_members'
 
     def __str__(self):
-        return f"{self.user_id} in {self.room.name}"
+        return f"{self.user_id} in {self.room.name} ({self.role})"

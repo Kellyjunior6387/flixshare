@@ -42,3 +42,8 @@ class TestJWT(APIView):
     def get(self, request):
         return Response({'user_id': request.user.unique_id})
 
+class VerifyUser(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        return Response({'user_id': request.user.unique_id,
+                         'is_authenticated': request.user.is_authenticated})

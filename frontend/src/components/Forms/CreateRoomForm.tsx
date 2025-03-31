@@ -102,11 +102,11 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({ open, onClose, onSubmit
             onChange={handleServiceChange}
           >
             <MenuItem value="netflix">Netflix</MenuItem>
-            <MenuItem value="Disney+">Disney+</MenuItem>
-            <MenuItem value="Spotify">Spotify</MenuItem>
-            <MenuItem value="HBO Max">HBO Max</MenuItem>
-            <MenuItem value="Apple TV+">Apple TV+</MenuItem>
-            <MenuItem value="YouTube Premium">YouTube Premium</MenuItem>
+            <MenuItem value="disney+">Disney+</MenuItem>
+            <MenuItem value="spotify">Spotify</MenuItem>
+            <MenuItem value="hbomax">HBO Max</MenuItem>
+            <MenuItem value="appletv">Apple TV+</MenuItem>
+            <MenuItem value="youtube">YouTube Premium</MenuItem>
           </Select>
         </FormControl>
         <TextField

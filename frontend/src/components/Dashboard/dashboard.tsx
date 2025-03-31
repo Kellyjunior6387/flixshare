@@ -41,6 +41,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
 import roomsData from './data';
 import CreateRoomForm, { RoomFormData } from '../Forms/CreateRoomForm';
+import JoinRoomForm from '../Forms/JoinRoomForm';
 import axios from 'axios'
 import {logout} from '../Auth/tokenManager'
 import { useNavigate } from 'react-router-dom';
@@ -57,6 +58,7 @@ const FlixshareApp: React.FC = () => {
     const [currentPage, setCurrentPage] = useState<string>('Dashboard');
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [openCreateDialog, setOpenCreateDialog] = useState(false);
+    const [openJoinDialog, setOpenJoinDialog] = useState(false)
     const navigate = useNavigate()
     
     const handleDrawerToggle = (): void => {
@@ -89,6 +91,10 @@ const FlixshareApp: React.FC = () => {
       setOpenCreateDialog(true);
       handleClose();
     };
+    const handleJoinRoom = () => {
+      setOpenJoinDialog(true);
+      handleClose();
+    };
     const handleCloseDialog = () => {
       setOpenCreateDialog(false);
     };
@@ -100,13 +106,31 @@ const FlixshareApp: React.FC = () => {
     const handleCreateRoomSubmit = async (roomData: RoomFormData) => {
       console.log('New Room:', roomData);
       try {
-        const response = await axios.post('http://127.0.0.1:8080/room/create/', roomData);
+        const token = localStorage.getItem('token');
+        const response = await axios.post(
+          'http://127.0.0.1:8080/room/create/', 
+          roomData,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
         console.log('Room created successfully:', response.data);
         handleCloseDialog();
-        // Optionally, refresh the rooms list or show a success message
+        // TODO: Refresh the rooms list
       } catch (error) {
-        console.error('Error creating room:', error);
-        // Optionally, show an error message to the user
+        if (axios.isAxiosError(error)) {
+          console.error('Error creating room:', error.response?.data);
+          // Handle 401 Unauthorized
+          if (error.response?.status === 401) {
+            // Token expired or invalid
+            navigate('/auth/login');
+          }
+        } else {
+          console.error('Error creating room:', error);
+        }
       }
     };
   
@@ -162,9 +186,13 @@ const FlixshareApp: React.FC = () => {
                 horizontal: 'right',
               }}
             >
-              <MenuItem>Join Room</MenuItem>
+              <MenuItem onClick={handleJoinRoom}>Join Room</MenuItem>
               <MenuItem onClick={handleCreateRoom}>Create New Room</MenuItem>
             </Menu>
+            <JoinRoomForm 
+            open={openJoinDialog}
+            onClose={() => setOpenJoinDialog(false)}
+            />
             <CreateRoomForm
                   open={openCreateDialog}
                   onClose={handleCloseDialog}
