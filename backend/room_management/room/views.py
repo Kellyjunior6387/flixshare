@@ -58,3 +58,40 @@ class JoinRoomView(APIView):
                 )
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ListUserRoomsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            user_id = request.user.id
+            # Get the rooms through RoomMember
+            user_room_members = RoomMember.objects.filter(user_id=user_id).select_related('room')
+            
+            rooms_data = []
+            for member in user_room_members:
+                room_data = {
+                    'id': str(member.room.room_id),
+                    'name': member.room.name,
+                    'description': member.room.description,
+                    'cost': str(member.room.cost),
+                    'due_date': member.room.due_date,
+                    'created_at': member.room.created_at,
+                    'role': member.role,
+                    'payment_status': member.payment_status,
+                    'member_count': member.room.members.count()
+                }
+                rooms_data.append(room_data)
+
+            return Response({
+                'rooms': rooms_data,
+                'total_rooms': len(rooms_data)
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(f"Error in ListUserRoomsView: {str(e)}")  # Debug print
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+           
+
+            
