@@ -30,7 +30,6 @@ import {
   //Search as SearchIcon, 
   Notifications as NotificationsIcon, 
   Dashboard as DashboardIcon, 
-  Group as GroupIcon, 
   Payment as PaymentIcon, 
   Settings as SettingsIcon,
   //MoreVert as MoreVertIcon,
@@ -39,12 +38,13 @@ import {
 } from '@mui/icons-material';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
-import roomsData from './data';
+import { useRooms } from './data';
 import CreateRoomForm, { RoomFormData } from '../Forms/CreateRoomForm';
 import JoinRoomForm from '../Forms/JoinRoomForm';
 import axios from 'axios'
 import {logout} from '../Auth/tokenManager'
 import { useNavigate } from 'react-router-dom';
+import { CircularProgress, Alert } from '@mui/material';
 
 
 interface NavItem {
@@ -52,19 +52,23 @@ interface NavItem {
     icon: React.ReactNode;
   }
 const FlixshareApp: React.FC = () => {
-    const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+    //State management
+    const [mobileOpen, setMobileOpen] = useState(false)
     const [profileAnchorEl, setProfileAnchorEl] = useState<null | HTMLElement>(null);
     const [addAnchorEl, setAddAnchorEl] = useState<null | HTMLElement>(null);
     const [currentPage, setCurrentPage] = useState<string>('Dashboard');
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [openCreateDialog, setOpenCreateDialog] = useState(false);
     const [openJoinDialog, setOpenJoinDialog] = useState(false)
-    const navigate = useNavigate()
-    
-    const handleDrawerToggle = (): void => {
-      setDrawerOpen(!drawerOpen);
-    };
 
+    //Hooks
+    const { rooms, loading, error, refetch } = useRooms();
+    const navigate = useNavigate()
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    
+    //Event handlers
+    const handleDrawerToggle = (): void => {
+      setMobileOpen(!mobileOpen)
+    };
     const handleAddClick = (event: React.MouseEvent<HTMLElement>) => {
         setAddAnchorEl(event.currentTarget);
       };
@@ -84,7 +88,7 @@ const FlixshareApp: React.FC = () => {
     const handlePageChange = (page: string): void => {
       setCurrentPage(page);
       if (isMobile) {
-        setDrawerOpen(false);
+        setMobileOpen(false);
       }
     };
     const handleCreateRoom = () => {
@@ -104,7 +108,6 @@ const FlixshareApp: React.FC = () => {
 
     }
     const handleCreateRoomSubmit = async (roomData: RoomFormData) => {
-      console.log('New Room:', roomData);
       try {
         const token = localStorage.getItem('token');
         const response = await axios.post(
@@ -119,7 +122,7 @@ const FlixshareApp: React.FC = () => {
         );
         console.log('Room created successfully:', response.data);
         handleCloseDialog();
-        // TODO: Refresh the rooms list
+        await refetch();
       } catch (error) {
         if (axios.isAxiosError(error)) {
           console.error('Error creating room:', error.response?.data);
@@ -133,21 +136,37 @@ const FlixshareApp: React.FC = () => {
         }
       }
     };
+
   
     // Navigation items
     const navItems: NavItem[] = [
       { text: 'Dashboard', icon: <DashboardIcon /> },
-      { text: 'My Rooms', icon: <GroupIcon /> },
       { text: 'Billing', icon: <PaymentIcon /> },
       { text: 'Settings', icon: <SettingsIcon /> }
     ];
+    if (loading) {
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <CircularProgress />
+        </Box>
+      );
+    }
+  
+    if (error) {
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <Alert severity="error">{error}</Alert>
+        </Box>
+      );
+    }
   
     return (
       <ThemeProvider theme={theme}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Box sx={{ display: 'flex'}}>
           {/* Top Navigation Bar */}
           <AppBar position="fixed" color="default" elevation={1}>
-            <Toolbar>
+            <Toolbar sx={{ justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <IconButton
                 edge="start"
                 color="inherit"
@@ -161,10 +180,10 @@ const FlixshareApp: React.FC = () => {
               <Typography variant="h6" noWrap sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 500, color: 'primary.main' }}>
                 Flixshare
               </Typography>
-              
-              <Box sx={{ flexGrow: 1 }} />
+              </Box>
 
                 {/* Add Room Button */}
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <IconButton
               color="primary"
               aria-label="add room"
@@ -173,32 +192,7 @@ const FlixshareApp: React.FC = () => {
             >
               <AddIcon />
             </IconButton>
-            <Menu
-              anchorEl={addAnchorEl}
-              open={Boolean(addAnchorEl)}
-              onClose={handleClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-            >
-              <MenuItem onClick={handleJoinRoom}>Join Room</MenuItem>
-              <MenuItem onClick={handleCreateRoom}>Create New Room</MenuItem>
-            </Menu>
-            <JoinRoomForm 
-            open={openJoinDialog}
-            onClose={() => setOpenJoinDialog(false)}
-            />
-            <CreateRoomForm
-                  open={openCreateDialog}
-                  onClose={handleCloseDialog}
-                  onSubmit={handleCreateRoomSubmit}
-             />
-
+            
               {/* Notification Icon */}
               <IconButton color="inherit">
                 <Badge badgeContent={3} color="error">
@@ -217,7 +211,37 @@ const FlixshareApp: React.FC = () => {
               >
                 <Avatar alt="User Profile" src="/api/placeholder/40/40" sx={{ width: 32, height: 32 }} />
               </IconButton>
-              
+              </Box>
+          </Toolbar>
+        </AppBar>
+
+        <Menu
+              anchorEl={addAnchorEl}
+              open={Boolean(addAnchorEl)}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+            >
+              <MenuItem onClick={handleJoinRoom}>Join Room</MenuItem>
+              <MenuItem onClick={handleCreateRoom}>Create New Room</MenuItem>
+            </Menu>
+            
+            <JoinRoomForm 
+            open={openJoinDialog}
+            onClose={() => setOpenJoinDialog(false)}
+            />
+            <CreateRoomForm
+                  open={openCreateDialog}
+                  onClose={handleCloseDialog}
+                  onSubmit={handleCreateRoomSubmit}
+             />
+
               {/* Profile Dropdown Menu */}
               <Menu
                 id="profile-menu"
@@ -240,20 +264,26 @@ const FlixshareApp: React.FC = () => {
                   Logout
                 </MenuItem>
               </Menu>
-            </Toolbar>
-          </AppBar>
           
           {/* Left Navigation Drawer */}
           <Drawer
             variant={isMobile ? "temporary" : "permanent"}
-            open={drawerOpen}
+            open={isMobile ? mobileOpen : true}
             onClose={handleDrawerToggle}
+            ModalProps={{
+              keepMounted: true,
+            }}
             sx={{
+              display: { xs: 'block', sm: 'block' },
               '& .MuiDrawer-paper': {
+                boxSizing: 'border-box',
+                width: 240,
                 marginTop: '64px', // AppBar height
                 height: 'calc(100% - 64px)',
-                zIndex: theme.zIndex.appBar - 1,
-                width: '240px'
+                zIndex: (theme) => theme.zIndex.appBar - 1,
+                border: 'none',
+                bgcolor: 'background.paper',
+                boxShadow: 1
               }
             }}
           >
@@ -288,24 +318,31 @@ const FlixshareApp: React.FC = () => {
           
           {/* Main Content Area */}
           <Box
-            component="main"
-            sx={{
-              flexGrow: 1,
-              p: 3,
-              width: { sm: `calc(100% - ${isMobile ? 0 : 240}px)` },
-              ml: { sm: isMobile ? 0 : '240px' },
-              mt: '64px' // AppBar height
-            }}
+           component="main"
+           sx={{
+             flexGrow: 1,
+             p: 3,
+             width: {
+               xs: '100%',
+               sm: `calc(100% - ${240}px)`
+             },
+             ml: {
+               xs: 0,
+               sm: '240px'
+             },
+             transition: theme.transitions.create(['width', 'margin'], {
+               easing: theme.transitions.easing.sharp,
+               duration: theme.transitions.duration.leavingScreen,
+             }),
+             mt: '64px'
+           }}
           >
             {/* Dashboard Content */}
             <Container maxWidth="xl">
-              <Typography variant="h5" sx={{ mb: 3, mt: 1, fontWeight: 500 }}>
-                {currentPage}
-              </Typography>
               
               {/* Grid of Room Cards */}
               <Grid container spacing={3}>
-                {roomsData.map((room) => (
+                {rooms.map((room) => (
                   <Grid item key={room.id} xs={12} sm={6} md={4} lg={3}>
                     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                       {/* Card Header */}
@@ -317,7 +354,7 @@ const FlixshareApp: React.FC = () => {
                         <CardMedia
                           component="img"
                           sx={{ width: 40, height: 40 }}
-                          image={room.logoUrl}
+                          image={`services/${room.service.toLowerCase()}.png`}
                           alt={room.service}
                         />
                         <Box sx={{ ml: 2 }}>
@@ -333,36 +370,31 @@ const FlixshareApp: React.FC = () => {
                       {/* Card Content */}
                       <CardContent sx={{ pt: 2, pb: 1, flexGrow: 1 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                          <Avatar alt={room.owner} src={room.ownerAvatar} sx={{ width: 24, height: 24 }} />
+                    
+                          <Avatar alt={room.role}  sx={{ width: 24, height: 24 }} />
                           <Typography variant="body2" sx={{ ml: 1 }}>
-                            {room.owner === 'You' ? 'You (Owner)' : `Owner: ${room.owner}`}
+                            {room.role === 'owner' ? 'Owner: You' : `Owner: ${room.owner_username}`}
                           </Typography>
                         </Box>
                         
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                          Next billing: {room.nextBilling}
+                          Next billing: {room.due_date}
                         </Typography>
                         
                         <Typography variant="body2" color="text.secondary">
-                          {room.memberCount} members · ${room.monthlyCost}/month
+                          {room.member_count} members · ${room.cost}/month
                         </Typography>
                       </CardContent>
                       
                       {/* Card Actions */}
                       <CardActions sx={{ p: 2, pt: 0, justifyContent: 'space-between' }}>
                         <Button 
-                          variant="outlined" 
-                          size="small"
-                          color="primary"
-                        >
-                          View Details
-                        </Button>
-                        <Button 
                           variant="contained" 
                           size="small"
                           color="primary"
+                          onClick={() => navigate(`/room/${room.id}`)}
                         >
-                          {room.isOwner ? 'Manage' : 'Join'}
+                          View Details
                         </Button>
                       </CardActions>
                     </Card>

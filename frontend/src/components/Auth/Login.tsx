@@ -102,7 +102,7 @@ const Login: React.FC = () => {
                         <Button
                             fullWidth
                             variant="text"
-                            onClick={() => navigate('/register')}
+                            onClick={() => navigate('/auth/register')}
                         >
                             Don't have an account? Sign Up
                         </Button>

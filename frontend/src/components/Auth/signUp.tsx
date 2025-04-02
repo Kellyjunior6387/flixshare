@@ -42,7 +42,7 @@ const Register: React.FC = () => {
             setSuccess(true);
             // Redirect to login page after 2 seconds
             setTimeout(() => {
-                navigate('/login');
+                navigate('/auth/login');
             }, 2000);
 
         } catch (error) {

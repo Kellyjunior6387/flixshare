@@ -9,17 +9,7 @@ import Register from "./components/Auth/signUp";
 function App() {
     return (
         <div className="App">
-            <header>
-                <div className="header-container">
-                    <a href="/">
-                        <img src="/favicon.svg" alt="FlixShare" />
-                    </a>
-                </div>
-                <div className="header-container-right">
-                    <a href="/login">Login</a>
-                    <a href="/register">Register</a>
-                </div>
-            </header>
+            
             <div className="app-container">
                 <BrowserRouter>
                     <Routes>
@@ -39,9 +29,9 @@ function App() {
                         <Route 
                             path="/room/:roomId"
                             element={
-                                //<PrivateRoute>
+                                <PrivateRoute>
                                     <RoomDetail />
-                                //</PrivateRoute>
+                                </PrivateRoute>
                             }
                         />
                     </Routes>
