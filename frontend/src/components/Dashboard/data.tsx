@@ -27,7 +27,6 @@ export const useRooms = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(response.data.rooms)
             setRooms(response.data.rooms);
             setLoading(false);
         } catch (error) {

@@ -14,9 +14,10 @@ import axios from 'axios';
 interface JoinRoomFormProps {
   open: boolean;
   onClose: () => void;
+  onJoinSuccess: () => void;
 }
 
-const JoinRoomForm: React.FC<JoinRoomFormProps> = ({ open, onClose }) => {
+const JoinRoomForm: React.FC<JoinRoomFormProps> = ({ open, onClose, onJoinSuccess }) => {
   const [roomId, setRoomId] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -40,7 +41,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({ open, onClose }) => {
       console.log(response)
       setSuccess(true);
       onClose();
-      // Optionally refresh the rooms list
+      onJoinSuccess();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(error.response?.data?.error || 'Failed to join room');

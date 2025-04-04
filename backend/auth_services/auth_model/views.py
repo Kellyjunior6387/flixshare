@@ -46,7 +46,8 @@ class VerifyUser(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         return Response({'user_id': request.user.unique_id,
-                         'is_authenticated': request.user.is_authenticated})
+                         'username': request.user.username},
+                        )
 
 class UserInfo(APIView):
      permission_classes = [IsAuthenticated]

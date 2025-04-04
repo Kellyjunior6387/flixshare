@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { 
-  AppBar, 
-  Toolbar, 
-  IconButton, 
+  //AppBar, 
+  //Toolbar, 
+  //IconButton, 
   Typography, 
   //InputBase, 
-  Badge, 
+  //Badge, 
   Drawer, 
   List, 
   ListItem, 
@@ -26,15 +26,15 @@ import {
   Box
 } from '@mui/material';
 import { 
-  Menu as MenuIcon, 
+  //Menu as MenuIcon, 
   //Search as SearchIcon, 
-  Notifications as NotificationsIcon, 
+  //Notifications as NotificationsIcon, 
   Dashboard as DashboardIcon, 
   Payment as PaymentIcon, 
   Settings as SettingsIcon,
   //MoreVert as MoreVertIcon,
   ExitToApp as ExitToAppIcon,
-  Add as AddIcon,
+  //Add as AddIcon,
 } from '@mui/icons-material';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
@@ -45,6 +45,7 @@ import axios from 'axios'
 import {logout} from '../Auth/tokenManager'
 import { useNavigate } from 'react-router-dom';
 import { CircularProgress, Alert } from '@mui/material';
+import AppHeader from '../topBar';
 
 
 interface NavItem {
@@ -72,11 +73,11 @@ const FlixshareApp: React.FC = () => {
     const handleAddClick = (event: React.MouseEvent<HTMLElement>) => {
         setAddAnchorEl(event.currentTarget);
       };
-    
+    /*
     const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>): void => {
       setProfileAnchorEl(event.currentTarget);
     };
-    
+    */
     const handleProfileMenuClose = (): void => {
       setProfileAnchorEl(null);
     };
@@ -164,56 +165,10 @@ const FlixshareApp: React.FC = () => {
       <ThemeProvider theme={theme}>
         <Box sx={{ display: 'flex'}}>
           {/* Top Navigation Bar */}
-          <AppBar position="fixed" color="default" elevation={1}>
-            <Toolbar sx={{ justifyContent: 'space-between' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-                onClick={handleDrawerToggle}
-                sx={{ mr: 2 }}
-              >
-                <MenuIcon />
-              </IconButton>
-              
-              <Typography variant="h6" noWrap sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 500, color: 'primary.main' }}>
-                Flixshare
-              </Typography>
-              </Box>
-
-                {/* Add Room Button */}
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton
-              color="primary"
-              aria-label="add room"
-              onClick={handleAddClick}
-              sx={{ ml: 2 }}
-            >
-              <AddIcon />
-            </IconButton>
-            
-              {/* Notification Icon */}
-              <IconButton color="inherit">
-                <Badge badgeContent={3} color="error">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-              
-              {/* Profile Avatar */}
-              <IconButton
-                edge="end"
-                aria-label="account of current user"
-                aria-controls="profile-menu"
-                aria-haspopup="true"
-                onClick={handleProfileMenuOpen}
-                color="inherit"
-              >
-                <Avatar alt="User Profile" src="/api/placeholder/40/40" sx={{ width: 32, height: 32 }} />
-              </IconButton>
-              </Box>
-          </Toolbar>
-        </AppBar>
+           <AppHeader  // Add username from your auth context/state
+          onCreateClick={handleAddClick}
+        />
+        
 
         <Menu
               anchorEl={addAnchorEl}
@@ -235,6 +190,7 @@ const FlixshareApp: React.FC = () => {
             <JoinRoomForm 
             open={openJoinDialog}
             onClose={() => setOpenJoinDialog(false)}
+            onJoinSuccess={refetch}
             />
             <CreateRoomForm
                   open={openCreateDialog}
