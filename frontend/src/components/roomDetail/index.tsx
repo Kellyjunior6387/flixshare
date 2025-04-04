@@ -124,7 +124,7 @@ const RoomDetail: React.FC = () => {
           </Grid>
           <Grid item xs={12} sm={4}>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'flex-start', sm: 'flex-end' } }}>
-              <Typography variant="h6">${room.cost}/month</Typography>
+              <Typography variant="h6">{room.cost} Ksh/month</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                 Next billing: {new Date(room.due_date).toLocaleDateString()}
               </Typography>
@@ -190,7 +190,7 @@ const RoomDetail: React.FC = () => {
             <Card variant="outlined" sx={{ height: '100%' }}>
               <CardContent>
                 <Typography color="primary" variant="subtitle2">Individual Cost</Typography>
-                <Typography variant="h5" sx={{ my: 1 }}>${individualCost.toFixed(2)}/mo</Typography>
+                <Typography variant="h5" sx={{ my: 1 }}>{individualCost.toFixed(2)} Ksh/mo</Typography>
                 <Typography variant="body2" color="text.secondary">
                   Per member cost
                 </Typography>

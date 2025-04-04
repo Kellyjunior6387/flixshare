@@ -338,7 +338,7 @@ const FlixshareApp: React.FC = () => {
                         </Typography>
                         
                         <Typography variant="body2" color="text.secondary">
-                          {room.member_count} members · ${room.cost}/month
+                          {room.member_count} members · {room.cost} Ksh/month
                         </Typography>
                       </CardContent>
                       

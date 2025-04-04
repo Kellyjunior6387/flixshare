@@ -123,13 +123,13 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({ open, onClose, onSubmit
         <TextField
           margin="dense"
           name="cost"
-          label="Monthly Cost ($)"
+          label="Monthly Cost (Ksh)"
           type="number"
           fullWidth
           value={formData.cost}
           onChange={handleInputChange}
           InputProps={{
-            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+            startAdornment: <InputAdornment position="start">Ksh</InputAdornment>,
           }}
         />
       </DialogContent>
