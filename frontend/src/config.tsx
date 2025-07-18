@@ -63,7 +63,7 @@ export const SuperTokensConfig = {
         }),
         Session.init(),
     ],
-    getRedirectionURL: async (context) => {
+    getRedirectionURL: async (context: { action: string; newSessionCreated?: boolean }) => {
         if (context.action === "SUCCESS" && context.newSessionCreated) {
             return "/dashboard";
         }
