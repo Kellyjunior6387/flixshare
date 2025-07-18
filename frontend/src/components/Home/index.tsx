@@ -9,7 +9,7 @@ export default function Home() {
                         <strong>SuperTokens</strong> x <strong>React</strong> <br /> example project
                     </p>
                     <div className="buttons">
-                        <a href="/auth" className="sessionButton">
+                        <a href="/auth/register" className="sessionButton">
                             Sign-up / Login
                         </a>
                         <a href="/dashboard" className="sessionButton">

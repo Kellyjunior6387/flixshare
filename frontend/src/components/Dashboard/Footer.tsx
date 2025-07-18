@@ -1,4 +1,4 @@
-import { SeparatorLine } from "../assets/images";
+import { SeparatorLine } from "../../assets/images";
 import { Link } from "./index";
 
 interface FooterProps {

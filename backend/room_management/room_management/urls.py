@@ -1,5 +1,5 @@
 """
-URL configuration for auth_services project.
+URL configuration for room_management project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -16,13 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from auth_services import views
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-     path("users/", views.UsersAPI.as_view()),
-     path("tenants/", views.TenantsAPI.as_view()),
-     path("sessioninfo/", views.SessionInfoAPI.as_view()),
-     path('auth/', include('auth_model.urls'))
+    path('room/', include('room.urls')),
 ]

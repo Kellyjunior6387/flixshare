@@ -19,6 +19,7 @@ class UsersAPI(APIView):
         })
 class TenantsAPI(APIView):
     def get(self, request, format=None):
+        print(request.COOKIES)
         tenantReponse = list_all_tenants()
 
         tenantsList = []
