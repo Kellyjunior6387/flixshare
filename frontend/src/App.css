@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @font-face {
     font-family: Menlo;
     src: url("./assets/fonts/MenloRegular.ttf");
@@ -5,10 +7,13 @@
 
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
         "Droid Sans", "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    min-height: 100vh;
 }
 
 code {
@@ -36,7 +41,8 @@ code {
     flex-direction: column;
     width: 100%;
     height: 100%;
-    font-family: Rubik;
+    font-family: 'Inter', sans-serif;
+    background: transparent;
 }
 
 .fill {
@@ -52,17 +58,25 @@ code {
 }
 
 .sessionButton {
-    padding-left: 13px;
-    padding-right: 13px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    background-color: black;
-    border-radius: 10px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
     cursor: pointer;
     color: white;
-    font-weight: bold;
-    font-size: 17px;
+    font-weight: 600;
+    font-size: 16px;
     text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px 0 rgba(102, 126, 234, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sessionButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px 0 rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #7c9cec 0%, #8a5cb4 100%);
 }
 
 header {
@@ -70,8 +84,13 @@ header {
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    padding: 8px;
-    border-bottom: 2px solid #e0e0e0;
+    padding: 16px 24px;
+    background: rgba(26, 26, 46, 0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .header-container {
@@ -86,11 +105,16 @@ header {
 }
 
 .header-container-right a {
-    color: #ff8a15;
+    color: #667eea;
     font-weight: 600;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
 
     &:hover {
-        color: #ff9933;
+        color: #ffffff;
+        background: rgba(102, 126, 234, 0.2);
     }
 }
 
@@ -120,9 +144,11 @@ header {
 
 #home-container {
     align-items: center;
-    min-height: calc(100vh - 58px);
-    background: url("./assets/images/background.png");
-    background-size: cover;
+    min-height: calc(100vh - 70px);
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .bold-700 {
@@ -130,23 +156,27 @@ header {
 }
 
 .app-container .main-container {
-    box-shadow: 0px 0px 60px 0px rgba(0, 0, 0, 0.16);
-    width: min(635px, calc(100% - 24px));
-    border-radius: 16px;
-    margin-block-end: 159px;
-    background-color: #ffffff;
+    background: rgba(26, 26, 46, 0.6);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    width: min(500px, calc(100% - 32px));
+    border-radius: 20px;
+    margin-block-end: 80px;
+    overflow: hidden;
 }
 
 .main-container .success-title {
     line-height: 1;
-    padding-block: 26px;
-    background-color: #e7ffed;
+    padding-block: 24px;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     text-align: center;
-    color: #3eb655;
+    color: #ffffff;
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    font-size: 20px;
+    font-size: 18px;
+    font-weight: 600;
 }
 
 .success-title img.success-icon {
@@ -154,36 +184,30 @@ header {
 }
 
 .main-container .inner-content {
-    padding-block: 48px;
+    padding: 40px 32px;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+    color: #ffffff;
 }
 
 .inner-content #user-id {
     position: relative;
-    padding: 14px 17px;
-    border-image-slice: 1;
-    width: min(430px, calc(100% - 30px));
-    margin-inline: auto;
-    margin-block: 11px 23px;
-    border-radius: 9px;
-    line-height: 1;
-    font-family: Menlo, serif;
+    padding: 16px 20px;
+    width: min(400px, calc(100% - 32px));
+    margin: 16px auto 24px;
+    border-radius: 12px;
+    line-height: 1.4;
+    font-family: 'JetBrains Mono', Menlo, serif;
     cursor: text;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
 }
 
 .inner-content #user-id:before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 9px;
-    padding: 2px;
-    background: linear-gradient(90.31deg, #ff9933 0.11%, #ff3f33 99.82%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    -webkit-mask-composite: xor;
+    display: none;
 }
 
 .main-container > .top-band,
@@ -214,7 +238,8 @@ header {
     display: flex;
     justify-content: flex-end;
     padding-inline: 21px;
-    background-color: #212d4f;
+    background: rgba(33, 45, 79, 0.8);
+    backdrop-filter: blur(10px);
 }
 
 .bottom-cta-container .view-code {
@@ -226,15 +251,33 @@ header {
 
 .bottom-links-container {
     display: grid;
-    grid-template-columns: repeat(4, auto);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
     margin-bottom: 22px;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .bottom-links-container .link {
     display: flex;
     align-items: center;
-    margin-inline-end: 68px;
+    padding: 12px 16px;
     cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bottom-links-container .link:hover {
+    background: rgba(102, 126, 234, 0.1);
+    border-color: rgba(102, 126, 234, 0.3);
+    color: #ffffff;
+    transform: translateY(-1px);
 }
 
 .bottom-links-container .link:last-child {
@@ -252,15 +295,16 @@ header {
 }
 
 .link .link-icon {
-    width: 15px;
-    margin-right: 5px;
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    filter: brightness(1.2);
 }
 
 @media screen and (max-width: 768px) {
     .bottom-links-container {
-        grid-template-columns: repeat(2, 1fr);
-        column-gap: 64px;
-        row-gap: 34px;
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
     }
 
     .bottom-links-container .link {
@@ -269,6 +313,10 @@ header {
 
     .separator-line {
         max-width: 200px;
+    }
+
+    .main-container .inner-content {
+        padding: 32px 24px;
     }
 }
 

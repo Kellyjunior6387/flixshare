@@ -18,10 +18,40 @@ export function getWebsiteDomain() {
 
 export const SuperTokensConfig = {
     appInfo: {
-        appName: "SuperTokens Demo App",
+        appName: "FlixShare",
         apiDomain: getApiDomain(),
         websiteDomain: getWebsiteDomain(),
     },
+    style: `
+        [data-supertokens~=container] {
+            background: rgba(26, 26, 46, 0.6);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+        [data-supertokens~=headerTitle] {
+            color: #ffffff;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        [data-supertokens~=providerButton] {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-radius: 12px;
+        }
+        [data-supertokens~=providerButtonText] {
+            color: #ffffff;
+        }
+        [data-supertokens~=link] {
+            color: #667eea;
+        }
+        [data-supertokens~=secondaryText] {
+            color: rgba(255, 255, 255, 0.7);
+        }
+    `,
     // recipeList contains all the modules that you want to
     // use from SuperTokens. See the full list here: https://supertokens.com/docs/guides
     recipeList: [

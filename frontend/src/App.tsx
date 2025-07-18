@@ -16,7 +16,17 @@ function App() {
             <header>
                 <div className="header-container">
                     <a href="/">
-                        <img src="/favicon.svg" alt="SuperTokens" />
+                        <div style={{
+                            fontSize: '1.5rem',
+                            fontWeight: '700',
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text',
+                            textDecoration: 'none'
+                        }}>
+                            FlixShare
+                        </div>
                     </a>
                 </div>
                 <div className="header-container-right">
@@ -24,7 +34,7 @@ function App() {
                         Docs
                     </a>
                     <a href="https://github.com/supertokens/create-supertokens-app" target="_blank">
-                        CLI Repo
+                        GitHub
                     </a>
                 </div>
             </header>

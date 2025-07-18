@@ -51,10 +51,19 @@ export default function Dashboard() {
         <div className="fill" id="home-container">
             <div className="main-container">
                 <div className="top-band success-title bold-500">
-                    <img src={CelebrateIcon} alt="Login successful" className="success-icon" /> Login successful
+                    <img src={CelebrateIcon} alt="Login successful" className="success-icon" /> 
+                    Welcome to FlixShare!
                 </div>
                 <div className="inner-content">
-                    <div>Your userID is:</div>
+                    <h2 style={{ 
+                        fontSize: '1.5rem', 
+                        fontWeight: '600', 
+                        margin: '0 0 1rem 0',
+                        color: '#ffffff'
+                    }}>
+                        Dashboard
+                    </h2>
+                    <div style={{ marginBottom: '1rem', opacity: '0.8' }}>Your user ID:</div>
                     <div className="truncate" id="user-id">
                         {sessionContext.userId}
                     </div>
