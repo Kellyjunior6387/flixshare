@@ -16,8 +16,6 @@ export default function Home() {
                             <img src="/favicon.svg" alt="FlixShare" className="favicon" />
                             <span className="brand-name">FlixShare</span>
                         </a>
-                    </div>
-                    <div className="nav-center">
                         <button 
                             className="nav-link" 
                             onClick={() => scrollToSection('about')}
@@ -66,15 +64,21 @@ export default function Home() {
                     <div className="hero-visual">
                         <div className="feature-cards">
                             <div className="feature-card">
-                                <div className="card-icon">🎵</div>
+                                <div className="card-icon">
+                                    <img src="/services/spotify.png" alt="Spotify" className="service-icon" />
+                                </div>
                                 <h3>Spotify</h3>
                             </div>
                             <div className="feature-card">
-                                <div className="card-icon">📺</div>
+                                <div className="card-icon">
+                                    <img src="/services/youtube.png" alt="YouTube" className="service-icon" />
+                                </div>
                                 <h3>YouTube</h3>
                             </div>
                             <div className="feature-card">
-                                <div className="card-icon">🎬</div>
+                                <div className="card-icon">
+                                    <img src="/services/netflix.png" alt="Netflix" className="service-icon" />
+                                </div>
                                 <h3>Netflix</h3>
                             </div>
                         </div>
