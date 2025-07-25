@@ -113,6 +113,18 @@ const authTheme = createTheme({
     '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
   ],
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        'html, body': {
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
+          minHeight: '100vh',
+        },
+        '#root': {
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
+          minHeight: '100vh',
+        },
+      },
+    },
     MuiPaper: {
       styleOverrides: {
         root: {

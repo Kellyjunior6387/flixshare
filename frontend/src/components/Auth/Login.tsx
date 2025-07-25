@@ -12,7 +12,8 @@ import {
     InputAdornment,
     Slide,
     Fade,
-    ThemeProvider
+    ThemeProvider,
+    CssBaseline
 } from '@mui/material';
 import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
 import axios from 'axios';
@@ -70,6 +71,7 @@ const Login: React.FC = () => {
 
     return (
         <ThemeProvider theme={authTheme}>
+            <CssBaseline />
             <Container 
                 component="main" 
                 maxWidth="sm" 

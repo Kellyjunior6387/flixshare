@@ -216,31 +216,29 @@ const FlixshareApp: React.FC = () => {
               </IconButton>
 
               {/* User Profile */}
-              {!userLoading && user && (
-                <IconButton 
-                  onClick={handleProfileMenuOpen} 
+              <IconButton 
+                onClick={handleProfileMenuOpen} 
+                sx={{ 
+                  p: 0.5,
+                  '&:hover': {
+                    background: 'rgba(99, 102, 241, 0.1)',
+                  },
+                }}
+              >
+                <Avatar 
                   sx={{ 
-                    p: 0.5,
-                    '&:hover': {
-                      background: 'rgba(99, 102, 241, 0.1)',
-                    },
+                    width: 40, 
+                    height: 40, 
+                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                    textTransform: 'uppercase',
+                    fontWeight: 700,
+                    border: '2px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 4px 16px rgba(99, 102, 241, 0.2)',
                   }}
                 >
-                  <Avatar 
-                    sx={{ 
-                      width: 40, 
-                      height: 40, 
-                      background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                      textTransform: 'uppercase',
-                      fontWeight: 700,
-                      border: '2px solid rgba(255, 255, 255, 0.1)',
-                      boxShadow: '0 4px 16px rgba(99, 102, 241, 0.2)',
-                    }}
-                  >
-                    {user.username[0]}
-                  </Avatar>
-                </IconButton>
-              )}
+                  {userLoading ? '...' : (user?.username?.[0] || 'U')}
+                </Avatar>
+              </IconButton>
             </Box>
           </Toolbar>
         </AppBar>
