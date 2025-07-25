@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import RoomDetail from "./components/roomDetail";
-import RoomDetailDemo from "./components/roomDetail/demo";
 import Home from "./components/Home";
 import PrivateRoute from "./components/Auth/PrivateRoute";
 import Login from "./components/Auth/Login";
@@ -15,7 +14,6 @@ function App() {
                 <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<Home />} />
-                        <Route path="/room-demo" element={<RoomDetailDemo />} />
                         <Route path="/auth/login" element={<Login/>} />
                         <Route path="/auth/register" element={<Register />} />
                         
