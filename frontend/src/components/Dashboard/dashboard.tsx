@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  //AppBar, 
-  //Toolbar, 
-  //IconButton, 
   Typography, 
-  //InputBase, 
-  //Badge, 
   Drawer, 
   List, 
   ListItem, 
@@ -18,23 +13,24 @@ import {
   Grid, 
   Card, 
   CardContent, 
-  CardMedia, 
   CardActions, 
   Button, 
   Divider, 
   useMediaQuery,
-  Box
+  Box,
+  CssBaseline,
+  Chip,
+  IconButton,
 } from '@mui/material';
 import { 
-  //Menu as MenuIcon, 
-  //Search as SearchIcon, 
-  //Notifications as NotificationsIcon, 
   Dashboard as DashboardIcon, 
   Payment as PaymentIcon, 
   Settings as SettingsIcon,
-  //MoreVert as MoreVertIcon,
   ExitToApp as ExitToAppIcon,
-  //Add as AddIcon,
+  Group as GroupIcon,
+  CalendarToday as CalendarIcon,
+  AttachMoney as MoneyIcon,
+  Star as StarIcon,
 } from '@mui/icons-material';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
@@ -163,13 +159,14 @@ const FlixshareApp: React.FC = () => {
   
     return (
       <ThemeProvider theme={theme}>
-        <Box sx={{ display: 'flex'}}>
+        <CssBaseline />
+        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
           {/* Top Navigation Bar */}
-           <AppHeader  // Add username from your auth context/state
-          onCreateClick={handleAddClick}
-        />
+           <AppHeader  
+            onCreateClick={handleAddClick}
+            onJoinClick={handleJoinRoom}
+          />
         
-
         <Menu
               anchorEl={addAnchorEl}
               open={Boolean(addAnchorEl)}
@@ -182,9 +179,39 @@ const FlixshareApp: React.FC = () => {
                 vertical: 'top',
                 horizontal: 'right',
               }}
+              sx={{
+                '& .MuiPaper-root': {
+                  background: 'linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '16px',
+                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+                  backdropFilter: 'blur(16px)',
+                  mt: 1,
+                },
+              }}
             >
-              <MenuItem onClick={handleJoinRoom}>Join Room</MenuItem>
-              <MenuItem onClick={handleCreateRoom}>Create New Room</MenuItem>
+              <MenuItem 
+                onClick={handleJoinRoom}
+                sx={{ 
+                  py: 1.5, px: 3,
+                  '&:hover': {
+                    background: 'rgba(99, 102, 241, 0.1)',
+                  },
+                }}
+              >
+                Join Room
+              </MenuItem>
+              <MenuItem 
+                onClick={handleCreateRoom}
+                sx={{ 
+                  py: 1.5, px: 3,
+                  '&:hover': {
+                    background: 'rgba(99, 102, 241, 0.1)',
+                  },
+                }}
+              >
+                Create New Room
+              </MenuItem>
             </Menu>
             
             <JoinRoomForm 
@@ -233,17 +260,27 @@ const FlixshareApp: React.FC = () => {
               display: { xs: 'block', sm: 'block' },
               '& .MuiDrawer-paper': {
                 boxSizing: 'border-box',
-                width: 240,
-                marginTop: '64px', // AppBar height
-                height: 'calc(100% - 64px)',
+                width: 260,
+                marginTop: '70px', // AppBar height
+                height: 'calc(100% - 70px)',
                 zIndex: (theme) => theme.zIndex.appBar - 1,
                 border: 'none',
-                bgcolor: 'background.paper',
-                boxShadow: 1
+                background: 'linear-gradient(180deg, #1a1a2e 0%, #16213e 100%)',
+                borderRight: '1px solid rgba(255, 255, 255, 0.08)',
               }
             }}
           >
-            <List>
+            <Box sx={{ p: 2 }}>
+              <Typography variant="overline" sx={{ 
+                color: 'text.secondary', 
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                ml: 2,
+              }}>
+                NAVIGATION
+              </Typography>
+            </Box>
+            <List sx={{ px: 1 }}>
               {navItems.map((item) => (
                 <ListItem 
                   button 
@@ -252,21 +289,32 @@ const FlixshareApp: React.FC = () => {
                   onClick={() => handlePageChange(item.text)}
                   sx={{
                     my: 0.5,
-                    mx: 1,
-                    borderRadius: 1,
+                    borderRadius: '12px',
                     '&.Mui-selected': {
-                      bgcolor: 'secondary.main',
-                      color: 'primary.main',
+                      background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%)',
+                      border: '1px solid rgba(99, 102, 241, 0.3)',
                       '& .MuiListItemIcon-root': {
-                        color: 'primary.main',
+                        color: '#6366f1',
+                      },
+                      '& .MuiListItemText-primary': {
+                        color: '#6366f1',
+                        fontWeight: 600,
                       }
-                    }
+                    },
+                    '&:hover': {
+                      background: 'rgba(255, 255, 255, 0.05)',
+                    },
                   }}
                 >
-                  <ListItemIcon>
+                  <ListItemIcon sx={{ minWidth: '40px' }}>
                     {item.icon}
                   </ListItemIcon>
-                  <ListItemText primary={item.text} />
+                  <ListItemText 
+                    primary={item.text} 
+                    primaryTypographyProps={{
+                      fontWeight: currentPage === item.text ? 600 : 500,
+                    }}
+                  />
                 </ListItem>
               ))}
             </List>
@@ -277,86 +325,256 @@ const FlixshareApp: React.FC = () => {
            component="main"
            sx={{
              flexGrow: 1,
-             p: 3,
+             p: { xs: 2, sm: 3 },
              width: {
                xs: '100%',
-               sm: `calc(100% - ${240}px)`
+               sm: `calc(100% - ${260}px)`
              },
              ml: {
                xs: 0,
-               sm: '240px'
+               sm: '260px'
              },
              transition: theme.transitions.create(['width', 'margin'], {
                easing: theme.transitions.easing.sharp,
                duration: theme.transitions.duration.leavingScreen,
              }),
-             mt: '64px'
+             mt: '70px',
+             minHeight: 'calc(100vh - 70px)',
            }}
           >
-            {/* Dashboard Content */}
-            <Container maxWidth="xl">
+            {/* Dashboard Header */}
+            <Box sx={{ mb: 4 }}>
+              <Typography 
+                variant="h3" 
+                sx={{ 
+                  fontWeight: 700,
+                  background: 'linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  mb: 1,
+                }}
+              >
+                Your Rooms
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+                Manage your subscription sharing rooms and collaborate with friends
+              </Typography>
               
-              {/* Grid of Room Cards */}
+              {/* Quick Stats */}
+              <Grid container spacing={2} sx={{ mb: 4 }}>
+                <Grid item xs={6} sm={3}>
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: '16px',
+                    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%)',
+                    border: '1px solid rgba(99, 102, 241, 0.2)',
+                  }}>
+                    <Typography variant="h4" sx={{ fontWeight: 700, color: '#6366f1' }}>
+                      {rooms.length}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                      Active Rooms
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
+
+            {/* Grid of Room Cards */}
+            <Container maxWidth="xl" disableGutters>
               <Grid container spacing={3}>
                 {rooms.map((room) => (
                   <Grid item key={room.id} xs={12} sm={6} md={4} lg={3}>
-                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <Card 
+                      sx={{ 
+                        height: '100%', 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        position: 'relative',
+                        overflow: 'visible',
+                      }}
+                    >
+                      {/* Service Badge */}
+                      <Box sx={{
+                        position: 'absolute',
+                        top: -8,
+                        right: 16,
+                        zIndex: 1,
+                      }}>
+                        <Chip
+                          label={room.service}
+                          size="small"
+                          sx={{
+                            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                            color: 'white',
+                            fontWeight: 600,
+                            fontSize: '0.75rem',
+                            height: 24,
+                          }}
+                        />
+                      </Box>
+
                       {/* Card Header */}
                       <Box sx={{ 
                         display: 'flex', 
-                        p: 2,
-                        borderBottom: '1px solid rgba(0, 0, 0, 0.08)'
+                        p: 3,
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.02) 100%)',
                       }}>
-                        <CardMedia
-                          component="img"
-                          sx={{ width: 40, height: 40 }}
-                          image={`services/${room.service.toLowerCase()}.png`}
-                          alt={room.service}
-                        />
-                        <Box sx={{ ml: 2 }}>
-                          <Typography variant="h6" sx={{ lineHeight: 1.2 }}>
+                        <Box sx={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: '12px',
+                          background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          mr: 2,
+                          boxShadow: '0 4px 16px rgba(99, 102, 241, 0.3)',
+                        }}>
+                          <img
+                            src={`services/${room.service.toLowerCase()}.png`}
+                            alt={room.service}
+                            style={{ width: 24, height: 24 }}
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        </Box>
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography variant="h6" sx={{ 
+                            lineHeight: 1.2,
+                            fontWeight: 600,
+                            color: 'text.primary',
+                            mb: 0.5,
+                          }}>
                             {room.name}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {room.service}
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            {room.role === 'owner' ? '👑 Your Room' : '🤝 Member'}
                           </Typography>
                         </Box>
                       </Box>
                       
                       {/* Card Content */}
-                      <CardContent sx={{ pt: 2, pb: 1, flexGrow: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    
-                          <Avatar alt={room.role}  sx={{ width: 24, height: 24 }} />
-                          <Typography variant="body2" sx={{ ml: 1 }}>
+                      <CardContent sx={{ pt: 3, pb: 2, flexGrow: 1 }}>
+                        {/* Owner Info */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                          <Avatar 
+                            sx={{ 
+                              width: 28, 
+                              height: 28,
+                              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                              mr: 1,
+                            }}
+                          >
+                            {room.role === 'owner' ? '👑' : room.owner_username[0].toUpperCase()}
+                          </Avatar>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                             {room.role === 'owner' ? 'Owner: You' : `Owner: ${room.owner_username}`}
                           </Typography>
                         </Box>
                         
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                          Next billing: {room.due_date}
-                        </Typography>
-                        
-                        <Typography variant="body2" color="text.secondary">
-                          {room.member_count} members · {room.cost} Ksh/month
-                        </Typography>
+                        {/* Stats Row */}
+                        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <GroupIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                              {room.member_count}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <MoneyIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                              {room.cost} Ksh
+                            </Typography>
+                          </Box>
+                        </Box>
+
+                        {/* Due Date */}
+                        <Box sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: 1,
+                          p: 1.5,
+                          borderRadius: '8px',
+                          background: 'rgba(255, 255, 255, 0.02)',
+                          border: '1px solid rgba(255, 255, 255, 0.05)',
+                        }}>
+                          <CalendarIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            Due: {new Date(room.due_date).toLocaleDateString()}
+                          </Typography>
+                        </Box>
                       </CardContent>
                       
                       {/* Card Actions */}
-                      <CardActions sx={{ p: 2, pt: 0, justifyContent: 'space-between' }}>
+                      <CardActions sx={{ p: 3, pt: 0, justifyContent: 'space-between' }}>
                         <Button 
                           variant="contained" 
-                          size="small"
-                          color="primary"
+                          size="medium"
                           onClick={() => navigate(`/room/${room.id}`)}
+                          sx={{
+                            flexGrow: 1,
+                            fontWeight: 600,
+                          }}
                         >
                           View Details
                         </Button>
+                        {room.role === 'owner' && (
+                          <IconButton 
+                            size="small"
+                            sx={{ 
+                              ml: 1,
+                              color: 'warning.main',
+                              '&:hover': {
+                                background: 'rgba(245, 158, 11, 0.1)',
+                              },
+                            }}
+                          >
+                            <StarIcon fontSize="small" />
+                          </IconButton>
+                        )}
                       </CardActions>
                     </Card>
                   </Grid>
                 ))}
               </Grid>
+
+              {/* Empty State */}
+              {rooms.length === 0 && (
+                <Box sx={{ 
+                  textAlign: 'center', 
+                  py: 8,
+                  background: 'linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                }}>
+                  <Typography variant="h5" sx={{ mb: 2, color: 'text.primary' }}>
+                    No rooms yet
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 4, color: 'text.secondary' }}>
+                    Create your first room or join an existing one to get started
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                    <Button 
+                      variant="contained" 
+                      onClick={handleCreateRoom}
+                      sx={{ fontWeight: 600 }}
+                    >
+                      Create Room
+                    </Button>
+                    <Button 
+                      variant="outlined" 
+                      onClick={handleJoinRoom}
+                      sx={{ fontWeight: 600 }}
+                    >
+                      Join Room
+                    </Button>
+                  </Box>
+                </Box>
+              )}
             </Container>
           </Box>
         </Box>

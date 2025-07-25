@@ -10,10 +10,15 @@ import {
   MenuItem,
   ListItemIcon,
   Divider,
+  Button,
+  Chip,
 } from '@mui/material';
 import {
   Add as AddIcon,
   ExitToApp as ExitToAppIcon,
+  Person as PersonIcon,
+  Settings as SettingsIcon,
+  MeetingRoom as MeetingRoomIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../Auth/tokenManager';
@@ -21,12 +26,13 @@ import { useAuth } from './getData';
 
 interface AppHeaderProps {
   onCreateClick: (event: React.MouseEvent<HTMLElement>) => void;
+  onJoinClick?: () => void;
 }
 
-const AppHeader: React.FC<AppHeaderProps> = ({ onCreateClick }) => {
+const AppHeader: React.FC<AppHeaderProps> = ({ onCreateClick, onJoinClick }) => {
   const [profileAnchorEl, setProfileAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
-  const {user, loading} = useAuth()
+  const { user, loading } = useAuth();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setProfileAnchorEl(event.currentTarget);
@@ -42,54 +48,148 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onCreateClick }) => {
   };
 
   return (
-    <AppBar position="fixed" color="default" elevation={1}>
-      <Toolbar sx={{ justifyContent: 'space-between' }}>
-        {/* Left section */}
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <img
-            src="/favicon.svg"
-            alt="Flixshare Logo"
-            style={{ height: 32, marginRight: 16 }}
-          />
+    <AppBar 
+      position="fixed" 
+      sx={{ 
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        background: 'rgba(15, 15, 35, 0.95)',
+        backdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1), 0 8px 32px rgba(0, 0, 0, 0.3)',
+      }}
+    >
+      <Toolbar sx={{ 
+        justifyContent: 'space-between', 
+        px: { xs: 2, sm: 3 },
+        minHeight: '70px !important',
+      }}>
+        {/* Left section - Logo and Brand */}
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          gap: 2,
+        }}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            p: 1,
+            borderRadius: '12px',
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+            border: '1px solid rgba(99, 102, 241, 0.2)',
+          }}>
+            <img
+              src="/favicon.svg"
+              alt="Flixshare Logo"
+              style={{ height: 28, width: 28 }}
+            />
+          </Box>
           <Typography 
-            variant="h6" 
+            variant="h5" 
             sx={{ 
-              fontWeight: 500, 
-              color: 'primary.main',
-              display: { xs: 'none', sm: 'block' } 
+              fontWeight: 700,
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              display: { xs: 'none', sm: 'block' },
+              letterSpacing: '-0.02em',
             }}
           >
             Flixshare
           </Typography>
         </Box>
 
-        {/* Right section */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {/* Right section - Actions and Profile */}
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: { xs: 1, sm: 2 },
+        }}>
+          {/* Join Room Button - Hidden on mobile */}
+          <Button
+            variant="outlined"
+            startIcon={<MeetingRoomIcon />}
+            onClick={onJoinClick}
+            sx={{
+              display: { xs: 'none', md: 'flex' },
+              borderRadius: '12px',
+              borderColor: 'rgba(99, 102, 241, 0.3)',
+              color: 'text.primary',
+              '&:hover': {
+                borderColor: '#6366f1',
+                background: 'rgba(99, 102, 241, 0.1)',
+              },
+            }}
+          >
+            Join Room
+          </Button>
+
+          {/* Create/Add Button */}
           <IconButton
-            color="primary"
             onClick={onCreateClick}
+            sx={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+              color: 'white',
+              width: 44,
+              height: 44,
+              boxShadow: '0 4px 16px rgba(99, 102, 241, 0.3)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                boxShadow: '0 8px 24px rgba(99, 102, 241, 0.4)',
+                transform: 'translateY(-1px)',
+              },
+            }}
           >
             <AddIcon />
           </IconButton>
 
+          {/* User Profile */}
           {!loading && user && (
-            <IconButton onClick={handleProfileMenuOpen} sx={{ ml: 1 }}>
-              <Avatar 
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ display: { xs: 'none', sm: 'flex' }, flexDirection: 'column', alignItems: 'flex-end' }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                  {user.username}
+                </Typography>
+                <Chip 
+                  label="Pro" 
+                  size="small" 
+                  sx={{ 
+                    height: 16,
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    color: 'white',
+                    fontSize: '0.6rem',
+                    fontWeight: 600,
+                  }}
+                />
+              </Box>
+              <IconButton 
+                onClick={handleProfileMenuOpen} 
                 sx={{ 
-                  width: 32, 
-                  height: 32, 
-                  bgcolor: 'primary.main',
-                  textTransform: 'uppercase'
+                  p: 0.5,
+                  '&:hover': {
+                    background: 'rgba(99, 102, 241, 0.1)',
+                  },
                 }}
               >
-                {user.username[0]}
-              </Avatar>
-            </IconButton>
+                <Avatar 
+                  sx={{ 
+                    width: 40, 
+                    height: 40, 
+                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                    textTransform: 'uppercase',
+                    fontWeight: 700,
+                    border: '2px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 4px 16px rgba(99, 102, 241, 0.2)',
+                  }}
+                >
+                  {user.username[0]}
+                </Avatar>
+              </IconButton>
+            </Box>
           )}
         </Box>
-        
 
-        {/* Profile Menu */}
+        {/* Enhanced Profile Menu */}
         <Menu
           id="profile-menu"
           anchorEl={profileAnchorEl}
@@ -97,18 +197,74 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onCreateClick }) => {
           onClose={handleProfileMenuClose}
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          sx={{
+            '& .MuiPaper-root': {
+              background: 'linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '16px',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+              backdropFilter: 'blur(16px)',
+              mt: 1,
+              minWidth: 200,
+            },
+          }}
         >
-          <MenuItem onClick={handleProfileMenuClose}>Profile</MenuItem>
-          <MenuItem onClick={handleProfileMenuClose}>Account Settings</MenuItem>
-          <Divider />
+          <Box sx={{ p: 2, borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+              {user?.username}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              user@flixshare.com
+            </Typography>
+          </Box>
+          
+          <MenuItem 
+            onClick={handleProfileMenuClose}
+            sx={{ 
+              py: 1.5,
+              '&:hover': {
+                background: 'rgba(99, 102, 241, 0.1)',
+              },
+            }}
+          >
+            <ListItemIcon>
+              <PersonIcon sx={{ color: 'text.secondary' }} />
+            </ListItemIcon>
+            Profile
+          </MenuItem>
+          
+          <MenuItem 
+            onClick={handleProfileMenuClose}
+            sx={{ 
+              py: 1.5,
+              '&:hover': {
+                background: 'rgba(99, 102, 241, 0.1)',
+              },
+            }}
+          >
+            <ListItemIcon>
+              <SettingsIcon sx={{ color: 'text.secondary' }} />
+            </ListItemIcon>
+            Account Settings
+          </MenuItem>
+          
+          <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+          
           <MenuItem 
             onClick={() => {
               handleLogOut();
               handleProfileMenuClose();
             }}
+            sx={{ 
+              py: 1.5,
+              color: 'error.main',
+              '&:hover': {
+                background: 'rgba(239, 68, 68, 0.1)',
+              },
+            }}
           >
             <ListItemIcon>
-              <ExitToAppIcon fontSize="small" />
+              <ExitToAppIcon sx={{ color: 'error.main' }} />
             </ListItemIcon>
             Logout
           </MenuItem>
