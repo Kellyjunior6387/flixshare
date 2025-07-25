@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { signOut } from "supertokens-auth-react/recipe/session";
-import { recipeDetails } from "../config";
+import { recipeDetails } from "../../config";
 import CallAPIView from "./CallAPIView";
-import { BlogsIcon, CelebrateIcon, GuideIcon, SeparatorLine, SignOutIcon } from "../assets/images";
+import { BlogsIcon, CelebrateIcon, GuideIcon, SeparatorLine, SignOutIcon } from "../../assets/images";
 
 interface ILink {
     name: string;
