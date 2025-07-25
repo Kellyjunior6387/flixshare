@@ -227,10 +227,7 @@ const authTheme = createTheme({
             display: 'flex',
             alignItems: 'center',
             background: `
-              radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
-              linear-gradient(135deg, #0f172a 0%, #1e293b 100%)
+              linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)
             `,
             position: 'relative',
             '&::before': {
@@ -241,7 +238,7 @@ const authTheme = createTheme({
               right: 0,
               bottom: 0,
               background: `
-                radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.03) 0%, transparent 70%)
+                radial-gradient(ellipse at center, rgba(99, 102, 241, 0.08) 0%, transparent 60%)
               `,
               pointerEvents: 'none',
             },
