@@ -13,7 +13,8 @@ import {
     Slide,
     Fade,
     ThemeProvider,
-    LinearProgress
+    LinearProgress,
+    CssBaseline
 } from '@mui/material';
 import { Visibility, VisibilityOff, Email, Lock, Person } from '@mui/icons-material';
 import axios from 'axios';
@@ -97,6 +98,7 @@ const Register: React.FC = () => {
 
     return (
         <ThemeProvider theme={authTheme}>
+            <CssBaseline />
             <Container 
                 component="main" 
                 maxWidth="sm" 
