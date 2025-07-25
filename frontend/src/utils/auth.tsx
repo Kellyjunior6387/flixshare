@@ -22,7 +22,7 @@ export const useAuth = () => {
       }
 
       const response = await axios.get(
-        'http://localhost:8000/auth/verify/',
+        'http://127.0.0.1:8080/auth/verify/',
         {
           headers: {
             'Authorization': `Bearer ${token}`

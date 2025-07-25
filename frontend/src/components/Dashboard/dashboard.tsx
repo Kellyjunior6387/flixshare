@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { 
   Typography, 
-  Drawer, 
-  List, 
-  ListItem, 
-  ListItemIcon, 
-  ListItemText, 
   Avatar, 
   Menu, 
   MenuItem, 
@@ -16,17 +11,19 @@ import {
   CardActions, 
   Button, 
   Divider, 
-  useMediaQuery,
   Box,
   CssBaseline,
   Chip,
   IconButton,
+  AppBar,
+  Toolbar,
+  ListItemIcon,
 } from '@mui/material';
 import { 
-  Dashboard as DashboardIcon, 
-  Payment as PaymentIcon, 
-  Settings as SettingsIcon,
+  Add as AddIcon,
   ExitToApp as ExitToAppIcon,
+  Person as PersonIcon,
+  Settings as SettingsIcon,
   Group as GroupIcon,
   CalendarToday as CalendarIcon,
   AttachMoney as MoneyIcon,
@@ -41,296 +38,364 @@ import axios from 'axios'
 import {logout} from '../Auth/tokenManager'
 import { useNavigate } from 'react-router-dom';
 import { CircularProgress, Alert } from '@mui/material';
-import AppHeader from '../topBar';
+import { useAuth } from '../../utils/auth';
 
 
-interface NavItem {
-    text: string;
-    icon: React.ReactNode;
-  }
 const FlixshareApp: React.FC = () => {
-    //State management
-    const [mobileOpen, setMobileOpen] = useState(false)
-    const [profileAnchorEl, setProfileAnchorEl] = useState<null | HTMLElement>(null);
-    const [addAnchorEl, setAddAnchorEl] = useState<null | HTMLElement>(null);
-    const [currentPage, setCurrentPage] = useState<string>('Dashboard');
-    const [openCreateDialog, setOpenCreateDialog] = useState(false);
-    const [openJoinDialog, setOpenJoinDialog] = useState(false)
+  //State management
+  const [profileAnchorEl, setProfileAnchorEl] = useState<null | HTMLElement>(null);
+  const [addAnchorEl, setAddAnchorEl] = useState<null | HTMLElement>(null);
+  const [openCreateDialog, setOpenCreateDialog] = useState(false);
+  const [openJoinDialog, setOpenJoinDialog] = useState(false)
 
-    //Hooks
-    const { rooms, loading, error, refetch } = useRooms();
-    const navigate = useNavigate()
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    
-    //Event handlers
-    const handleDrawerToggle = (): void => {
-      setMobileOpen(!mobileOpen)
-    };
-    const handleAddClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAddAnchorEl(event.currentTarget);
-      };
-    /*
-    const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>): void => {
-      setProfileAnchorEl(event.currentTarget);
-    };
-    */
-    const handleProfileMenuClose = (): void => {
-      setProfileAnchorEl(null);
-    };
-    
-    const handleClose = () => {
-        setAddAnchorEl(null);
-      };
-    
-    const handlePageChange = (page: string): void => {
-      setCurrentPage(page);
-      if (isMobile) {
-        setMobileOpen(false);
-      }
-    };
-    const handleCreateRoom = () => {
-      setOpenCreateDialog(true);
-      handleClose();
-    };
-    const handleJoinRoom = () => {
-      setOpenJoinDialog(true);
-      handleClose();
-    };
-    const handleCloseDialog = () => {
-      setOpenCreateDialog(false);
-    };
-    const handleLogOut = () => {
-        logout();
-        navigate('/auth/login')
+  //Hooks
+  const { rooms, loading, error, refetch } = useRooms();
+  const { user, loading: userLoading } = useAuth();
+  const navigate = useNavigate()
+  
+  //Event handlers
+  const handleAddClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAddAnchorEl(event.currentTarget);
+  };
 
-    }
-    const handleCreateRoomSubmit = async (roomData: RoomFormData) => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.post(
-          'http://127.0.0.1:8080/room/create/', 
-          roomData,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setProfileAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = (): void => {
+    setProfileAnchorEl(null);
+  };
+  
+  const handleClose = () => {
+    setAddAnchorEl(null);
+  };
+  
+  const handleCreateRoom = () => {
+    setOpenCreateDialog(true);
+    handleClose();
+  };
+  
+  const handleJoinRoom = () => {
+    setOpenJoinDialog(true);
+    handleClose();
+  };
+  
+  const handleCloseDialog = () => {
+    setOpenCreateDialog(false);
+  };
+  
+  const handleLogOut = () => {
+    logout();
+    navigate('/auth/login')
+  }
+  const handleCreateRoomSubmit = async (roomData: RoomFormData) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        'http://127.0.0.1:8080/room/create/', 
+        roomData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
           }
-        );
-        console.log('Room created successfully:', response.data);
-        handleCloseDialog();
-        await refetch();
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error('Error creating room:', error.response?.data);
-          // Handle 401 Unauthorized
-          if (error.response?.status === 401) {
-            // Token expired or invalid
-            navigate('/auth/login');
-          }
-        } else {
-          console.error('Error creating room:', error);
         }
+      );
+      console.log('Room created successfully:', response.data);
+      handleCloseDialog();
+      await refetch();
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error('Error creating room:', error.response?.data);
+        // Handle 401 Unauthorized
+        if (error.response?.status === 401) {
+          // Token expired or invalid
+          navigate('/auth/login');
+        }
+      } else {
+        console.error('Error creating room:', error);
       }
-    };
+    }
+  };
 
-  
-    // Navigation items
-    const navItems: NavItem[] = [
-      { text: 'Dashboard', icon: <DashboardIcon /> },
-      { text: 'Billing', icon: <PaymentIcon /> },
-      { text: 'Settings', icon: <SettingsIcon /> }
-    ];
-    if (loading) {
-      return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          <CircularProgress />
-        </Box>
-      );
-    }
-  
-    if (error) {
-      return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          <Alert severity="error">{error}</Alert>
-        </Box>
-      );
-    }
-  
+  if (loading || userLoading) {
     return (
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-          {/* Top Navigation Bar */}
-           <AppHeader  
-            onCreateClick={handleAddClick}
-          />
-        
-        <Menu
-              anchorEl={addAnchorEl}
-              open={Boolean(addAnchorEl)}
-              onClose={handleClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              sx={{
-                '& .MuiPaper-root': {
-                  background: 'linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '16px',
-                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
-                  backdropFilter: 'blur(16px)',
-                  mt: 1,
-                },
-              }}
-            >
-              <MenuItem 
-                onClick={handleJoinRoom}
-                sx={{ 
-                  py: 1.5, px: 3,
-                  '&:hover': {
-                    background: 'rgba(99, 102, 241, 0.1)',
-                  },
-                }}
-              >
-                Join Room
-              </MenuItem>
-              <MenuItem 
-                onClick={handleCreateRoom}
-                sx={{ 
-                  py: 1.5, px: 3,
-                  '&:hover': {
-                    background: 'rgba(99, 102, 241, 0.1)',
-                  },
-                }}
-              >
-                Create New Room
-              </MenuItem>
-            </Menu>
-            
-            <JoinRoomForm 
-            open={openJoinDialog}
-            onClose={() => setOpenJoinDialog(false)}
-            onJoinSuccess={refetch}
-            />
-            <CreateRoomForm
-                  open={openCreateDialog}
-                  onClose={handleCloseDialog}
-                  onSubmit={handleCreateRoomSubmit}
-             />
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
-              {/* Profile Dropdown Menu */}
-              <Menu
-                id="profile-menu"
-                anchorEl={profileAnchorEl}
-                keepMounted
-                open={Boolean(profileAnchorEl)}
-                onClose={handleProfileMenuClose}
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
+  
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        {/* Top Navigation Bar */}
+        <AppBar 
+          position="fixed" 
+          sx={{ 
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            background: 'rgba(15, 15, 35, 0.95)',
+            backdropFilter: 'blur(16px)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1), 0 8px 32px rgba(0, 0, 0, 0.3)',
+          }}
+        >
+          <Toolbar sx={{ 
+            justifyContent: 'space-between', 
+            px: { xs: 2, sm: 3 },
+            minHeight: '70px !important',
+          }}>
+            {/* Left section - Logo and Brand */}
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              gap: 2,
+            }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                p: 1,
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+                border: '1px solid rgba(99, 102, 241, 0.2)',
+              }}>
+                <img
+                  src="/favicon.svg"
+                  alt="Flixshare Logo"
+                  style={{ height: 28, width: 28 }}
+                />
+              </Box>
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  fontWeight: 700,
+                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  display: { xs: 'none', sm: 'block' },
+                  letterSpacing: '-0.02em',
+                }}
               >
-                <MenuItem onClick={handleProfileMenuClose}>Profile</MenuItem>
-                <MenuItem onClick={handleProfileMenuClose}>Account Settings</MenuItem>
-                <Divider />
-                <MenuItem onClick={() => {
-                  handleLogOut();
-                  handleProfileMenuClose();
-                }}>
-                  <ListItemIcon>
-                    <ExitToAppIcon 
-                    fontSize="small" />
-                  </ListItemIcon>
-                  Logout
-                </MenuItem>
-              </Menu>
-          
-          {/* Left Navigation Drawer */}
-          <Drawer
-            variant={isMobile ? "temporary" : "permanent"}
-            open={isMobile ? mobileOpen : true}
-            onClose={handleDrawerToggle}
-            ModalProps={{
-              keepMounted: true,
-            }}
-            sx={{
-              display: { xs: 'block', sm: 'block' },
-              '& .MuiDrawer-paper': {
-                boxSizing: 'border-box',
-                width: 260,
-                marginTop: '70px', // AppBar height
-                height: 'calc(100% - 70px)',
-                zIndex: (theme) => theme.zIndex.appBar - 1,
-                border: 'none',
-                background: 'linear-gradient(180deg, #1a1a2e 0%, #16213e 100%)',
-                borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-              }
-            }}
-          >
-            <List sx={{ px: 1, pt: 2 }}>
-              {navItems.map((item) => (
-                <ListItem 
-                  button 
-                  key={item.text} 
-                  selected={currentPage === item.text}
-                  onClick={() => handlePageChange(item.text)}
-                  sx={{
-                    my: 0.5,
-                    borderRadius: '12px',
-                    '&.Mui-selected': {
-                      background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%)',
-                      border: '1px solid rgba(99, 102, 241, 0.3)',
-                      '& .MuiListItemIcon-root': {
-                        color: '#6366f1',
-                      },
-                      '& .MuiListItemText-primary': {
-                        color: '#6366f1',
-                        fontWeight: 600,
-                      }
-                    },
+                Flixshare
+              </Typography>
+            </Box>
+
+            {/* Right section - Actions and Profile */}
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 1,
+            }}>
+              {/* Create/Add Button */}
+              <IconButton
+                onClick={handleAddClick}
+                sx={{
+                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                  color: 'white',
+                  width: 44,
+                  height: 44,
+                  boxShadow: '0 4px 16px rgba(99, 102, 241, 0.3)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                    boxShadow: '0 8px 24px rgba(99, 102, 241, 0.4)',
+                    transform: 'translateY(-1px)',
+                  },
+                }}
+              >
+                <AddIcon />
+              </IconButton>
+
+              {/* User Profile */}
+              {!userLoading && user && (
+                <IconButton 
+                  onClick={handleProfileMenuOpen} 
+                  sx={{ 
+                    p: 0.5,
                     '&:hover': {
-                      background: 'rgba(255, 255, 255, 0.05)',
+                      background: 'rgba(99, 102, 241, 0.1)',
                     },
                   }}
                 >
-                  <ListItemIcon sx={{ minWidth: '40px' }}>
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary={item.text} 
-                    primaryTypographyProps={{
-                      fontWeight: currentPage === item.text ? 600 : 500,
+                  <Avatar 
+                    sx={{ 
+                      width: 40, 
+                      height: 40, 
+                      background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                      textTransform: 'uppercase',
+                      fontWeight: 700,
+                      border: '2px solid rgba(255, 255, 255, 0.1)',
+                      boxShadow: '0 4px 16px rgba(99, 102, 241, 0.2)',
                     }}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </Drawer>
-          
-          {/* Main Content Area */}
-          <Box
-           component="main"
-           sx={{
-             flexGrow: 1,
-             p: { xs: 2, sm: 3 },
-             width: {
-               xs: '100%',
-               sm: `calc(100% - ${260}px)`
-             },
-             ml: {
-               xs: 0,
-               sm: '260px'
-             },
-             transition: theme.transitions.create(['width', 'margin'], {
-               easing: theme.transitions.easing.sharp,
-               duration: theme.transitions.duration.leavingScreen,
-             }),
-             mt: '70px',
-             minHeight: 'calc(100vh - 70px)',
-           }}
+                  >
+                    {user.username[0]}
+                  </Avatar>
+                </IconButton>
+              )}
+            </Box>
+          </Toolbar>
+        </AppBar>
+      
+        {/* Add Menu */}
+        <Menu
+          anchorEl={addAnchorEl}
+          open={Boolean(addAnchorEl)}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          sx={{
+            '& .MuiPaper-root': {
+              background: 'linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '16px',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+              backdropFilter: 'blur(16px)',
+              mt: 1,
+            },
+          }}
+        >
+          <MenuItem 
+            onClick={handleJoinRoom}
+            sx={{ 
+              py: 1.5, px: 3,
+              '&:hover': {
+                background: 'rgba(99, 102, 241, 0.1)',
+              },
+            }}
           >
+            Join Room
+          </MenuItem>
+          <MenuItem 
+            onClick={handleCreateRoom}
+            sx={{ 
+              py: 1.5, px: 3,
+              '&:hover': {
+                background: 'rgba(99, 102, 241, 0.1)',
+              },
+            }}
+          >
+            Create New Room
+          </MenuItem>
+        </Menu>
+        
+        {/* Enhanced Profile Menu */}
+        <Menu
+          id="profile-menu"
+          anchorEl={profileAnchorEl}
+          open={Boolean(profileAnchorEl)}
+          onClose={handleProfileMenuClose}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          sx={{
+            '& .MuiPaper-root': {
+              background: 'linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '16px',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+              backdropFilter: 'blur(16px)',
+              mt: 1,
+              minWidth: 200,
+            },
+          }}
+        >
+          <Box sx={{ p: 2, borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+              {user?.username}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              user@flixshare.com
+            </Typography>
+          </Box>
+          
+          <MenuItem 
+            onClick={handleProfileMenuClose}
+            sx={{ 
+              py: 1.5,
+              '&:hover': {
+                background: 'rgba(99, 102, 241, 0.1)',
+              },
+            }}
+          >
+            <ListItemIcon>
+              <PersonIcon sx={{ color: 'text.secondary' }} />
+            </ListItemIcon>
+            Profile
+          </MenuItem>
+          
+          <MenuItem 
+            onClick={handleProfileMenuClose}
+            sx={{ 
+              py: 1.5,
+              '&:hover': {
+                background: 'rgba(99, 102, 241, 0.1)',
+              },
+            }}
+          >
+            <ListItemIcon>
+              <SettingsIcon sx={{ color: 'text.secondary' }} />
+            </ListItemIcon>
+            Settings
+          </MenuItem>
+          
+          <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+          
+          <MenuItem 
+            onClick={() => {
+              handleLogOut();
+              handleProfileMenuClose();
+            }}
+            sx={{ 
+              py: 1.5,
+              color: 'error.main',
+              '&:hover': {
+                background: 'rgba(239, 68, 68, 0.1)',
+              },
+            }}
+          >
+            <ListItemIcon>
+              <ExitToAppIcon sx={{ color: 'error.main' }} />
+            </ListItemIcon>
+            Logout
+          </MenuItem>
+        </Menu>
+        
+        <JoinRoomForm 
+          open={openJoinDialog}
+          onClose={() => setOpenJoinDialog(false)}
+          onJoinSuccess={refetch}
+        />
+        <CreateRoomForm
+          open={openCreateDialog}
+          onClose={handleCloseDialog}
+          onSubmit={handleCreateRoomSubmit}
+        />
+
+        {/* Main Content Area */}
+        <Box
+         component="main"
+         sx={{
+           flexGrow: 1,
+           p: { xs: 2, sm: 3 },
+           width: '100%',
+           mt: '70px',
+           minHeight: 'calc(100vh - 70px)',
+         }}
+        >
             {/* Dashboard Header */}
             <Box sx={{ mb: 4 }}>
               <Typography 
