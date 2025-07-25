@@ -10,15 +10,12 @@ import {
   MenuItem,
   ListItemIcon,
   Divider,
-  Button,
-  Chip,
 } from '@mui/material';
 import {
   Add as AddIcon,
   ExitToApp as ExitToAppIcon,
   Person as PersonIcon,
   Settings as SettingsIcon,
-  MeetingRoom as MeetingRoomIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../Auth/tokenManager';
@@ -26,10 +23,9 @@ import { useAuth } from './getData';
 
 interface AppHeaderProps {
   onCreateClick: (event: React.MouseEvent<HTMLElement>) => void;
-  onJoinClick?: () => void;
 }
 
-const AppHeader: React.FC<AppHeaderProps> = ({ onCreateClick, onJoinClick }) => {
+const AppHeader: React.FC<AppHeaderProps> = ({ onCreateClick }) => {
   const [profileAnchorEl, setProfileAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
   const { user, loading } = useAuth();
@@ -103,27 +99,8 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onCreateClick, onJoinClick }) => 
         <Box sx={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: { xs: 1, sm: 2 },
+          gap: 1,
         }}>
-          {/* Join Room Button - Hidden on mobile */}
-          <Button
-            variant="outlined"
-            startIcon={<MeetingRoomIcon />}
-            onClick={onJoinClick}
-            sx={{
-              display: { xs: 'none', md: 'flex' },
-              borderRadius: '12px',
-              borderColor: 'rgba(99, 102, 241, 0.3)',
-              color: 'text.primary',
-              '&:hover': {
-                borderColor: '#6366f1',
-                background: 'rgba(99, 102, 241, 0.1)',
-              },
-            }}
-          >
-            Join Room
-          </Button>
-
           {/* Create/Add Button */}
           <IconButton
             onClick={onCreateClick}
@@ -145,47 +122,29 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onCreateClick, onJoinClick }) => 
 
           {/* User Profile */}
           {!loading && user && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box sx={{ display: { xs: 'none', sm: 'flex' }, flexDirection: 'column', alignItems: 'flex-end' }}>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                  {user.username}
-                </Typography>
-                <Chip 
-                  label="Pro" 
-                  size="small" 
-                  sx={{ 
-                    height: 16,
-                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                    color: 'white',
-                    fontSize: '0.6rem',
-                    fontWeight: 600,
-                  }}
-                />
-              </Box>
-              <IconButton 
-                onClick={handleProfileMenuOpen} 
+            <IconButton 
+              onClick={handleProfileMenuOpen} 
+              sx={{ 
+                p: 0.5,
+                '&:hover': {
+                  background: 'rgba(99, 102, 241, 0.1)',
+                },
+              }}
+            >
+              <Avatar 
                 sx={{ 
-                  p: 0.5,
-                  '&:hover': {
-                    background: 'rgba(99, 102, 241, 0.1)',
-                  },
+                  width: 40, 
+                  height: 40, 
+                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                  textTransform: 'uppercase',
+                  fontWeight: 700,
+                  border: '2px solid rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 4px 16px rgba(99, 102, 241, 0.2)',
                 }}
               >
-                <Avatar 
-                  sx={{ 
-                    width: 40, 
-                    height: 40, 
-                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                    textTransform: 'uppercase',
-                    fontWeight: 700,
-                    border: '2px solid rgba(255, 255, 255, 0.1)',
-                    boxShadow: '0 4px 16px rgba(99, 102, 241, 0.2)',
-                  }}
-                >
-                  {user.username[0]}
-                </Avatar>
-              </IconButton>
-            </Box>
+                {user.username[0]}
+              </Avatar>
+            </IconButton>
           )}
         </Box>
 

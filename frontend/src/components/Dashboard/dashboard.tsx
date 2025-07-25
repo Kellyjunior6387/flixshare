@@ -164,7 +164,6 @@ const FlixshareApp: React.FC = () => {
           {/* Top Navigation Bar */}
            <AppHeader  
             onCreateClick={handleAddClick}
-            onJoinClick={handleJoinRoom}
           />
         
         <Menu
@@ -270,17 +269,7 @@ const FlixshareApp: React.FC = () => {
               }
             }}
           >
-            <Box sx={{ p: 2 }}>
-              <Typography variant="overline" sx={{ 
-                color: 'text.secondary', 
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                ml: 2,
-              }}>
-                NAVIGATION
-              </Typography>
-            </Box>
-            <List sx={{ px: 1 }}>
+            <List sx={{ px: 1, pt: 2 }}>
               {navItems.map((item) => (
                 <ListItem 
                   button 
