@@ -13,7 +13,7 @@ export default function Home() {
                 <div className="nav-container">
                     <div className="nav-left">
                         <a href="/" className="logo-link" onClick={() => scrollToSection('hero')}>
-                            <img src="/favicon.svg" alt="FlixShare" className="favicon" />
+                            <img src="/favicon.ico" alt="FlixShare" className="favicon" />
                             <span className="brand-name">FlixShare</span>
                         </a>
                         <button 
@@ -154,7 +154,7 @@ export default function Home() {
                 <div className="footer-container">
                     <div className="footer-content">
                         <div className="footer-brand">
-                            <img src="/favicon.svg" alt="FlixShare" className="footer-logo" />
+                            <img src="/favicon.ico" alt="FlixShare" className="footer-logo" />
                             <span className="footer-brand-name">FlixShare</span>
                         </div>
                         <div className="footer-links">
