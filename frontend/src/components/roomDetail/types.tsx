@@ -1,4 +1,5 @@
 export interface RoomMember {
+  user_id: string;
   username: string;
   role: string;
   payment_status: string;

@@ -6,6 +6,7 @@ from .serializers import RoomCreateSerializer, RoomJoinSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 from .utils import get_owner_username
+from django.shortcuts import get_object_or_404
 
 
 class CreateRoomView(APIView):
@@ -122,6 +123,7 @@ class RoomDetailView(APIView):
             for member in room.members.all():
                 username = get_owner_username(member.user_id, request.auth)
                 members.append({
+                    'user_id': str(member.user_id),
                     'username': username,
                     'role': member.role,
                     'payment_status': member.payment_status,
@@ -152,4 +154,157 @@ class RoomDetailView(APIView):
             )
        
 
+class LeaveRoomView(APIView):
+    """
+    Allow non-owner members to leave a room.
+    Only non-owners can leave rooms.
+    """
+    permission_classes = [IsAuthenticated]
+
+    @transaction.atomic
+    def post(self, request, room_id):
+        try:
+            user_id = request.user.id
             
+            # Get the room member record
+            room_member = get_object_or_404(
+                RoomMember, 
+                room_id=room_id, 
+                user_id=user_id
+            )
+            
+            # Security check: Only non-owners can leave the room
+            if room_member.role == 'owner':
+                return Response(
+                    {'error': 'Room owners cannot leave the room. Consider deleting the room instead.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # Remove the member from the room
+            room_member.delete()
+            
+            return Response(
+                {'message': 'Successfully left the room'},
+                status=status.HTTP_200_OK
+            )
+            
+        except RoomMember.DoesNotExist:
+            return Response(
+                {'error': 'You are not a member of this room'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class DeleteRoomView(APIView):
+    """
+    Allow room owners to delete their rooms.
+    This removes all members and deletes the room.
+    """
+    permission_classes = [IsAuthenticated]
+
+    @transaction.atomic
+    def delete(self, request, room_id):
+        try:
+            user_id = request.user.id
+            
+            # Get the room
+            room = get_object_or_404(Room, room_id=room_id)
+            
+            # Security check: Only the owner can delete the room
+            if str(room.owner_id) != str(user_id):
+                return Response(
+                    {'error': 'Only the room owner can delete the room'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # Delete the room (CASCADE will remove all members)
+            room.delete()
+            
+            return Response(
+                {'message': 'Room deleted successfully'},
+                status=status.HTTP_200_OK
+            )
+            
+        except Room.DoesNotExist:
+            return Response(
+                {'error': 'Room not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class RemoveMemberView(APIView):
+    """
+    Allow room owners to remove members from their rooms.
+    Owners cannot remove themselves.
+    """
+    permission_classes = [IsAuthenticated]
+
+    @transaction.atomic
+    def post(self, request, room_id):
+        try:
+            user_id = request.user.id
+            member_user_id = request.data.get('member_user_id')
+            
+            if not member_user_id:
+                return Response(
+                    {'error': 'member_user_id is required'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get the room
+            room = get_object_or_404(Room, room_id=room_id)
+            
+            # Security check: Only the owner can remove members
+            if str(room.owner_id) != str(user_id):
+                return Response(
+                    {'error': 'Only the room owner can remove members'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # Get the member to be removed
+            member_to_remove = get_object_or_404(
+                RoomMember, 
+                room_id=room_id, 
+                user_id=member_user_id
+            )
+            
+            # Security check: Owner cannot remove themselves
+            if member_to_remove.role == 'owner':
+                return Response(
+                    {'error': 'Cannot remove the room owner'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # Remove the member
+            member_to_remove.delete()
+            
+            return Response(
+                {'message': 'Member removed successfully'},
+                status=status.HTTP_200_OK
+            )
+            
+        except Room.DoesNotExist:
+            return Response(
+                {'error': 'Room not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except RoomMember.DoesNotExist:
+            return Response(
+                {'error': 'Member not found in this room'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

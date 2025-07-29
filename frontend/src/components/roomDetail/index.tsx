@@ -18,18 +18,25 @@ import {
   Card,
   CardContent,
   Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   CircularProgress,
   Alert,
   ThemeProvider,
   CssBaseline,
   Container,
+  TextField,
+  Snackbar,
   //InputAdornment
 } from '@mui/material';
 import { 
   ArrowBack as ArrowBackIcon,
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon,
-  MoreVert as MoreVertIcon,
+  Delete as DeleteIcon,
+  RemoveCircle as RemoveCircleIcon,
+  ExitToApp as ExitToAppIcon,
   ContentCopy as ContentCopyIcon,
   PersonAdd as PersonAddIcon,
 
@@ -46,6 +53,13 @@ const RoomDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
+  const [removeMemberDialogOpen, setRemoveMemberDialogOpen] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<{ user_id: string; username: string } | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   useEffect(() => {
     const fetchRoomDetails = async () => {
@@ -74,6 +88,122 @@ const RoomDetail: React.FC = () => {
 
     fetchRoomDetails();
   }, [roomId, navigate]);
+
+  const handleLeaveRoom = async () => {
+    setActionLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `http://localhost:8080/room/${roomId}/leave/`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      setSnackbarMessage('Successfully left the room');
+      setSnackbarOpen(true);
+      setLeaveDialogOpen(false);
+      // Navigate back to dashboard
+      setTimeout(() => navigate('/dashboard'), 1500);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data?.error || 'Failed to leave room');
+      }
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteRoom = async () => {
+    setActionLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(
+        `http://localhost:8080/room/${roomId}/delete/`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      setSnackbarMessage('Room deleted successfully');
+      setSnackbarOpen(true);
+      setDeleteDialogOpen(false);
+      // Navigate back to dashboard
+      setTimeout(() => navigate('/dashboard'), 1500);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data?.error || 'Failed to delete room');
+      }
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRemoveMember = async () => {
+    if (!memberToRemove) return;
+    
+    setActionLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `http://localhost:8080/room/${roomId}/remove-member/`,
+        { member_user_id: memberToRemove.user_id },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      setSnackbarMessage(`${memberToRemove.username} removed successfully`);
+      setSnackbarOpen(true);
+      setRemoveMemberDialogOpen(false);
+      setMemberToRemove(null);
+      // Refresh room data
+      fetchRoomDetails();
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data?.error || 'Failed to remove member');
+      }
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleCopyRoomId = () => {
+    if (room) {
+      navigator.clipboard.writeText(room.id);
+      setSnackbarMessage('Room ID copied to clipboard!');
+      setSnackbarOpen(true);
+    }
+  };
+
+  const fetchRoomDetails = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `http://localhost:8080/room/${roomId}/`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      setRoom(response.data);
+      setLoading(false);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data?.error || 'Failed to fetch room details');
+        if (error.response?.status === 401) {
+          navigate('/login');
+        }
+      }
+      setLoading(false);
+    }
+  };
 
   // Payment status counts
   const paidCount = room?.members.filter(member => member.payment_status === 'paid').length || 0;
@@ -288,31 +418,82 @@ const RoomDetail: React.FC = () => {
                   Next billing: {new Date(room.due_date).toLocaleDateString()}
                 </Typography>
               </Box>
-              {room.user_role === 'owner' && (
-                <Button 
-                  variant="contained" 
-                  size="large"
-                  startIcon={<PersonAddIcon />}
-                  onClick={() => setInviteDialogOpen(true)}
-                  sx={{
-                    borderRadius: 3,
-                    px: 3,
-                    py: 1.5,
-                    fontSize: '1rem',
-                    fontWeight: 600,
-                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                    boxShadow: '0 10px 25px rgba(99, 102, 241, 0.4)',
-                    '&:hover': {
-                      background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 15px 35px rgba(99, 102, 241, 0.5)',
-                    },
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  }}
-                >
-                  Invite Member
-                </Button>
-              )}
+              <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+                {room.user_role === 'owner' ? (
+                  <>
+                    <Button 
+                      variant="contained" 
+                      size="large"
+                      startIcon={<PersonAddIcon />}
+                      onClick={() => setInviteDialogOpen(true)}
+                      sx={{
+                        borderRadius: 3,
+                        px: 3,
+                        py: 1.5,
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                        boxShadow: '0 10px 25px rgba(99, 102, 241, 0.4)',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 15px 35px rgba(99, 102, 241, 0.5)',
+                        },
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      }}
+                    >
+                      Invite Member
+                    </Button>
+                    <Button 
+                      variant="contained" 
+                      size="large"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => setDeleteDialogOpen(true)}
+                      sx={{
+                        borderRadius: 3,
+                        px: 3,
+                        py: 1.5,
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                        boxShadow: '0 10px 25px rgba(239, 68, 68, 0.4)',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 15px 35px rgba(239, 68, 68, 0.5)',
+                        },
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      }}
+                    >
+                      Delete Room
+                    </Button>
+                  </>
+                ) : (
+                  <Button 
+                    variant="contained" 
+                    size="large"
+                    startIcon={<ExitToAppIcon />}
+                    onClick={() => setLeaveDialogOpen(true)}
+                    sx={{
+                      borderRadius: 3,
+                      px: 3,
+                      py: 1.5,
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 100%)',
+                      boxShadow: '0 10px 25px rgba(245, 158, 11, 0.4)',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 15px 35px rgba(245, 158, 11, 0.5)',
+                      },
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
+                  >
+                    Leave Room
+                  </Button>
+                )}
+              </Box>
             </Box>
           </Grid>
         </Grid>
@@ -781,17 +962,21 @@ const RoomDetail: React.FC = () => {
                   <ListItemSecondaryAction>
                     <IconButton 
                       edge="end" 
-                      aria-label="more options"
+                      aria-label="remove member"
+                      onClick={() => {
+                        setMemberToRemove({ user_id: member.user_id, username: member.username });
+                        setRemoveMemberDialogOpen(true);
+                      }}
                       sx={{
-                        background: 'rgba(99, 102, 241, 0.1)',
+                        background: 'rgba(239, 68, 68, 0.1)',
                         '&:hover': {
-                          background: 'rgba(99, 102, 241, 0.2)',
+                          background: 'rgba(239, 68, 68, 0.2)',
                           transform: 'scale(1.1)',
                         },
                         transition: 'all 0.2s ease',
                       }}
                     >
-                      <MoreVertIcon sx={{ color: '#6366f1' }} />
+                      <RemoveCircleIcon sx={{ color: '#ef4444' }} />
                     </IconButton>
                   </ListItemSecondaryAction>
                 )}
@@ -811,7 +996,219 @@ const RoomDetail: React.FC = () => {
       </Paper>
 
       {/* Invite Dialog */}
-      <Dialog open={inviteDialogOpen} onClose={() => setInviteDialogOpen(false)} />
+      <Dialog 
+        open={inviteDialogOpen} 
+        onClose={() => setInviteDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            background: 'rgba(30, 41, 59, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#f8fafc', fontWeight: 600 }}>
+          Invite Members to Room
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ color: 'rgba(203, 213, 225, 0.8)', mb: 3 }}>
+            Share this Room ID with people you want to invite:
+          </Typography>
+          <TextField
+            fullWidth
+            value={room?.id || ''}
+            InputProps={{
+              readOnly: true,
+              endAdornment: (
+                <IconButton onClick={handleCopyRoomId} sx={{ color: '#6366f1' }}>
+                  <ContentCopyIcon />
+                </IconButton>
+              ),
+              sx: {
+                background: 'rgba(15, 23, 42, 0.6)',
+                color: '#f8fafc',
+                fontFamily: 'monospace',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(148, 163, 184, 0.2)',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(148, 163, 184, 0.4)',
+                },
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setInviteDialogOpen(false)}
+            sx={{ color: 'rgba(203, 213, 225, 0.8)' }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Leave Room Dialog */}
+      <Dialog 
+        open={leaveDialogOpen} 
+        onClose={() => setLeaveDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            background: 'rgba(30, 41, 59, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#f8fafc', fontWeight: 600 }}>
+          Leave Room
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" sx={{ color: 'rgba(203, 213, 225, 0.9)' }}>
+            Are you sure you want to leave this room? You will no longer have access to the shared subscription.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setLeaveDialogOpen(false)}
+            sx={{ color: 'rgba(203, 213, 225, 0.8)' }}
+            disabled={actionLoading}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleLeaveRoom}
+            disabled={actionLoading}
+            sx={{
+              background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 100%)',
+              color: '#ffffff',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+              },
+            }}
+          >
+            {actionLoading ? <CircularProgress size={20} /> : 'Leave Room'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Room Dialog */}
+      <Dialog 
+        open={deleteDialogOpen} 
+        onClose={() => setDeleteDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            background: 'rgba(30, 41, 59, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#f8fafc', fontWeight: 600 }}>
+          Delete Room
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" sx={{ color: 'rgba(203, 213, 225, 0.9)' }}>
+            Are you sure you want to delete this room? This action cannot be undone and will remove all members from the room.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setDeleteDialogOpen(false)}
+            sx={{ color: 'rgba(203, 213, 225, 0.8)' }}
+            disabled={actionLoading}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleDeleteRoom}
+            disabled={actionLoading}
+            sx={{
+              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+              color: '#ffffff',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+              },
+            }}
+          >
+            {actionLoading ? <CircularProgress size={20} /> : 'Delete Room'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Remove Member Dialog */}
+      <Dialog 
+        open={removeMemberDialogOpen} 
+        onClose={() => setRemoveMemberDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            background: 'rgba(30, 41, 59, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#f8fafc', fontWeight: 600 }}>
+          Remove Member
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" sx={{ color: 'rgba(203, 213, 225, 0.9)' }}>
+            Are you sure you want to remove <strong>{memberToRemove?.username}</strong> from this room?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => {
+              setRemoveMemberDialogOpen(false);
+              setMemberToRemove(null);
+            }}
+            sx={{ color: 'rgba(203, 213, 225, 0.8)' }}
+            disabled={actionLoading}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleRemoveMember}
+            disabled={actionLoading}
+            sx={{
+              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+              color: '#ffffff',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+              },
+            }}
+          >
+            {actionLoading ? <CircularProgress size={20} /> : 'Remove Member'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={() => setSnackbarOpen(false)} 
+          severity="success"
+          sx={{
+            background: 'rgba(16, 185, 129, 0.9)',
+            color: '#ffffff',
+          }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
         </Box>
       </Container>
     </ThemeProvider>
