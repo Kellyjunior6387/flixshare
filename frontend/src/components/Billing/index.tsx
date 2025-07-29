@@ -16,10 +16,9 @@ import {
   ListItemText,
   ListItemIcon,
   CssBaseline,
-  AppBar,
-  Toolbar,
   Menu,
   MenuItem,
+  TextField,
 } from '@mui/material';
 import {
   CreditCard as CreditCardIcon,
@@ -27,7 +26,6 @@ import {
   Delete as DeleteIcon,
   History as HistoryIcon,
   MoreVert as MoreVertIcon,
-  ArrowBack as ArrowBackIcon,
   Smartphone as MpesaIcon,
   Receipt as ReceiptIcon,
   CheckCircle as CheckCircleIcon,
@@ -35,8 +33,8 @@ import {
   Pending as PendingIcon,
 } from '@mui/icons-material';
 import { ThemeProvider } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
 import theme from '../Dashboard/theme';
+import TopBar from '../Dashboard/TopBar';
 
 // Mock data for demonstration
 const mockCreditCards = [
@@ -92,8 +90,8 @@ const mockTransactions = [
 ];
 
 const BillingPage: React.FC = () => {
-  const navigate = useNavigate();
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMenuAnchorEl(event.currentTarget);
@@ -101,6 +99,15 @@ const BillingPage: React.FC = () => {
 
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
+  };
+
+  const handleAddClick = () => {
+    // Add payment method functionality
+    console.log('Add payment method clicked');
+  };
+
+  const handlePhoneNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPhoneNumber(event.target.value);
   };
 
   const getStatusIcon = (status: string) => {
@@ -134,75 +141,7 @@ const BillingPage: React.FC = () => {
       <CssBaseline />
       <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         {/* Top Navigation Bar */}
-        <AppBar 
-          position="fixed" 
-          sx={{ 
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-            background: 'rgba(15, 15, 35, 0.95)',
-            backdropFilter: 'blur(16px)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1), 0 8px 32px rgba(0, 0, 0, 0.3)',
-          }}
-        >
-          <Toolbar sx={{ 
-            justifyContent: 'space-between', 
-            px: { xs: 2, sm: 3 },
-            minHeight: '70px !important',
-          }}>
-            {/* Left section - Back button and title */}
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              gap: 2,
-            }}>
-              <IconButton
-                onClick={() => navigate('/dashboard')}
-                sx={{
-                  color: 'text.primary',
-                  '&:hover': {
-                    background: 'rgba(99, 102, 241, 0.1)',
-                  },
-                }}
-              >
-                <ArrowBackIcon />
-              </IconButton>
-              <Typography 
-                variant="h5" 
-                sx={{ 
-                  fontWeight: 700,
-                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                Billing & Payments
-              </Typography>
-            </Box>
-
-            {/* Right section - Actions */}
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: 1,
-            }}>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                sx={{
-                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                  '&:hover': {
-                    background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                    transform: 'translateY(-1px)',
-                  },
-                }}
-              >
-                Add Payment Method
-              </Button>
-            </Box>
-          </Toolbar>
-        </AppBar>
+        <TopBar showAddButton={true} onAddClick={handleAddClick} />
 
         {/* Main Content Area */}
         <Box
@@ -216,9 +155,30 @@ const BillingPage: React.FC = () => {
           }}
         >
           <Container maxWidth="xl" disableGutters>
+            {/* Page Title */}
+            <Box sx={{ mb: 4 }}>
+              <Typography 
+                variant="h4" 
+                sx={{ 
+                  fontWeight: 700,
+                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  letterSpacing: '-0.02em',
+                  mb: 1,
+                }}
+              >
+                Billing & Payments
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                Manage your payment methods and view transaction history
+              </Typography>
+            </Box>
+
             <Grid container spacing={4}>
               {/* Credit Cards Section */}
-              <Grid item xs={12} lg={6}>
+              <Grid item xs={12}>
                 <Card sx={{ height: 'fit-content' }}>
                   <CardContent sx={{ p: 3 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
@@ -310,7 +270,7 @@ const BillingPage: React.FC = () => {
               </Grid>
 
               {/* M-Pesa Section */}
-              <Grid item xs={12} lg={6}>
+              <Grid item xs={12}>
                 <Card sx={{ height: 'fit-content' }}>
                   <CardContent sx={{ p: 3 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
@@ -323,6 +283,32 @@ const BillingPage: React.FC = () => {
                       <Typography variant="h6" sx={{ fontWeight: 600 }}>
                         M-Pesa
                       </Typography>
+                    </Box>
+
+                    {/* Phone Number Input */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        fullWidth
+                        label="Phone Number"
+                        placeholder="Enter your M-Pesa phone number"
+                        value={phoneNumber}
+                        onChange={handlePhoneNumberChange}
+                        variant="outlined"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '12px',
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#00a651',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#00a651',
+                            },
+                          },
+                          '& .MuiInputLabel-root.Mui-focused': {
+                            color: '#00a651',
+                          },
+                        }}
+                      />
                     </Box>
                     
                     <Box sx={{
@@ -342,10 +328,18 @@ const BillingPage: React.FC = () => {
                       </Typography>
                       <Button
                         variant="contained"
+                        disabled={!phoneNumber.trim()}
                         sx={{
-                          background: 'linear-gradient(135deg, #00a651 0%, #007a3d 100%)',
+                          background: phoneNumber.trim() 
+                            ? 'linear-gradient(135deg, #00a651 0%, #007a3d 100%)'
+                            : 'rgba(255, 255, 255, 0.1)',
                           '&:hover': {
-                            background: 'linear-gradient(135deg, #007a3d 0%, #005a2d 100%)',
+                            background: phoneNumber.trim() 
+                              ? 'linear-gradient(135deg, #007a3d 0%, #005a2d 100%)'
+                              : 'rgba(255, 255, 255, 0.1)',
+                          },
+                          '&:disabled': {
+                            color: 'rgba(255, 255, 255, 0.3)',
                           },
                         }}
                       >
@@ -363,8 +357,8 @@ const BillingPage: React.FC = () => {
                         How M-Pesa payment works:
                       </Typography>
                       <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
-                        1. Click "Pay with M-Pesa"<br />
-                        2. Enter your phone number<br />
+                        1. Enter your phone number above<br />
+                        2. Click "Pay with M-Pesa"<br />
                         3. Confirm payment on your phone<br />
                         4. Payment processed instantly
                       </Typography>
