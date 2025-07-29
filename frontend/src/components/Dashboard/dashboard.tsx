@@ -27,6 +27,7 @@ import {
   Group as GroupIcon,
   CalendarToday as CalendarIcon,
   AttachMoney as MoneyIcon,
+  Payment as PaymentIcon,
   Star as StarIcon,
 } from '@mui/icons-material';
 import { ThemeProvider } from '@mui/material/styles';
@@ -333,6 +334,24 @@ const FlixshareApp: React.FC = () => {
               <PersonIcon sx={{ color: 'text.secondary' }} />
             </ListItemIcon>
             Profile
+          </MenuItem>
+          
+          <MenuItem 
+            onClick={() => {
+              navigate('/billing');
+              handleProfileMenuClose();
+            }}
+            sx={{ 
+              py: 1.5,
+              '&:hover': {
+                background: 'rgba(99, 102, 241, 0.1)',
+              },
+            }}
+          >
+            <ListItemIcon>
+              <PaymentIcon sx={{ color: 'text.secondary' }} />
+            </ListItemIcon>
+            Billing & Payments
           </MenuItem>
           
           <MenuItem 
