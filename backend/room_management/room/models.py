@@ -1,10 +1,7 @@
-from django.db import models
-
 # Create your models here.
 # rooms/models.py
 import uuid
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
 
 class Room(models.Model):
     ROOM_SERVICES = [
