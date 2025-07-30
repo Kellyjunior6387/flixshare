@@ -155,17 +155,14 @@ const BillingPage: React.FC = () => {
     },
   ];
 
-  const mockUser = { user_id: '123', username: 'current_user' };
-
   // Use mock data when API is not available, otherwise use real data
   const effectiveRooms = rooms.length > 0 ? rooms : mockRooms;
-  const effectiveUser = user || mockUser;
   const effectiveRoomsLoading = roomsLoading && rooms.length === 0 ? false : roomsLoading;
   const effectiveUserLoading = userLoading && !user ? false : userLoading;
 
-  // Filter rooms where user is not the owner
+  // Filter rooms where user is a member (not owner)
   const payableRooms = effectiveRooms.filter(room => 
-    effectiveUser && room.owner_username !== effectiveUser.username
+    room.role === 'member'
   );
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -713,7 +710,7 @@ const BillingPage: React.FC = () => {
                                 {room.name} ({room.service})
                               </Typography>
                               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                KSh {room.cost.toLocaleString()} per person • {room.member_count} members
+                                KSh {(room.cost / room.member_count).toLocaleString()} per person • {room.member_count} members
                               </Typography>
                             </Box>
                           </MenuItem>
@@ -742,7 +739,7 @@ const BillingPage: React.FC = () => {
                                   Service: {roomDetails.service}
                                 </Typography>
                                 <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>
-                                  Amount: KSh {roomDetails.cost.toLocaleString()}
+                                  Amount: KSh {(roomDetails.cost / roomDetails.member_count).toLocaleString()}
                                 </Typography>
                                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                                   Phone: {phoneNumber}
@@ -785,7 +782,10 @@ const BillingPage: React.FC = () => {
                   },
                 }}
               >
-                Pay KSh {selectedRoom ? getSelectedRoomDetails()?.cost?.toLocaleString() || '0' : '0'}
+                Pay KSh {selectedRoom ? (() => {
+                  const roomDetails = getSelectedRoomDetails();
+                  return roomDetails ? Math.round(roomDetails.cost / roomDetails.member_count).toLocaleString() : '0';
+                })() : '0'}
               </Button>
             </DialogActions>
           )}
