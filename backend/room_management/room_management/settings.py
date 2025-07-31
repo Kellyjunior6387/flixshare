@@ -17,6 +17,7 @@ from corsheaders.defaults import default_headers
 from supertokens_python import get_all_cors_headers
 from typing import List
 from supertokens_python.framework.django import middleware
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,7 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'payments'
 ]
 
 MIDDLEWARE = [
@@ -160,6 +162,14 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ],
 }
+#MPESA CREDENTIALS
+MPESA_CONSUMER_KEY = os.getenv("MPESA_CONSUMER_KEY")
+MPESA_CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET")
+MPESA_SHORTCODE = "174379"  # Or your registered shortcode
+MPESA_PASSKEY = os.getenv("MPESA_CONSUMER_KEY")
+MPESA_CALLBACK_URL = "https://webhook.site/a3ef4c6c-99c8-4bdf-bfa8-5c3fb09e8728"
+
 
