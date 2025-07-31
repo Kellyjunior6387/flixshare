@@ -25,17 +25,11 @@ class MpesaSTKPushView(APIView):
         token_response = requests.request("GET", 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', 
                                           headers = { 'Authorization': f'Basic {encoded_data}' })
         access_token = token_response.json().get("access_token")
-        print(access_token)
-        print('Step 1 done')
-
-        # Step 2: Prepare STK Push Payload
+       
+         # Step 2: Prepare STK Push Payload
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        print(settings.MPESA_SHORTCODE, settings.MPESA_PASSKEY)
-
         password_str = f"{settings.MPESA_SHORTCODE}{settings.MPESA_PASSKEY}{timestamp}"
-        print(password_str)
         password = base64.b64encode(password_str.encode()).decode()
-        print(password)
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json"
