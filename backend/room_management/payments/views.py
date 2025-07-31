@@ -20,8 +20,10 @@ class MpesaSTKPushView(APIView):
             return Response({"error": "Missing required fields"}, status=400)
 
         # Step 1: Generate Access Token
+        data_to_encode = f"{settings.MPESA_CONSUMER_KEY}:{settings.MPESA_CONSUMER_SECRET}"
+        encoded_data = base64.b64encode(data_to_encode.encode()).decode()
         token_response = requests.request("GET", 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', 
-                                          headers = { 'Authorization': 'Basic eXlucWpWQU1GM0JXYnpkand3SEdkZEw2TTc1endndVh6azQzZmxhNUFXOVFnTEoxOnZHOHc4OGN0MlI2TU9GMldaaWFNYUVvWDdjOHc3cEdiY3RaNUN2S0pPaWdMMjBTYnRtc0tBdnJzQThZdXFVUmE=' })
+                                          headers = { 'Authorization': f'Basic {encoded_data}' })
         access_token = token_response.json().get("access_token")
         print(access_token)
         print('Step 1 done')
@@ -31,6 +33,7 @@ class MpesaSTKPushView(APIView):
         print(settings.MPESA_SHORTCODE, settings.MPESA_PASSKEY)
 
         password_str = f"{settings.MPESA_SHORTCODE}{settings.MPESA_PASSKEY}{timestamp}"
+        print(password_str)
         password = base64.b64encode(password_str.encode()).decode()
         print(password)
         headers = {
@@ -40,9 +43,8 @@ class MpesaSTKPushView(APIView):
 
         payload = {
             "BusinessShortCode": settings.MPESA_SHORTCODE,
-            #TODO: Remove this hardcoded credentials
-            "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjUwNzMxMTI1NDI0",
-            "Timestamp": "20250731125424",
+            "Password": password,
+            "Timestamp": timestamp,
             "TransactionType": "CustomerPayBillOnline",
             "Amount": amount,
             "PartyA": phone,

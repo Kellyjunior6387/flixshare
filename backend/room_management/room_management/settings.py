@@ -165,7 +165,7 @@ REST_FRAMEWORK = {
 MPESA_CONSUMER_KEY = os.getenv("MPESA_CONSUMER_KEY")
 MPESA_CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET")
 MPESA_SHORTCODE = "174379"  # Or your registered shortcode
-MPESA_PASSKEY = os.getenv("MPESA_CONSUMER_KEY")
+MPESA_PASSKEY = os.getenv("MPESA_PASSKEY")
 MPESA_CALLBACK_URL = "https://webhook.site/a3ef4c6c-99c8-4bdf-bfa8-5c3fb09e8728"
 
 
