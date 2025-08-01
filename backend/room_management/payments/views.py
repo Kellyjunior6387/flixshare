@@ -85,11 +85,12 @@ class MpesaCallbackView(APIView):
                         phone_number = item['Value']
                     elif item['Name'] == 'TransactionDate':
                         transaction_date = item['Value']
+            status_value = 'SUCCESS' if result_code == 0 else 'FAILED'
             Transaction.objects.create(
                 phone_number=phone_number or 'Unknown',
                 amount=amount or 0,
                 MpesaReceiptNumber=MpesaReceiptNumber or 'N/A',
-                status='SUCCESS',
+                status=status_value,
                 description=result_desc,
                 timestamp=transaction_date
             )
