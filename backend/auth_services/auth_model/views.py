@@ -13,11 +13,12 @@ class RegisterView(APIView):
         username = request.data.get('username')
         email = request.data.get("email")
         password = request.data.get("password")
+        phone_number = request.data.get("phone_number")
 
         if User.objects.filter(email=email).exists():
             return Response({"error": "Email already exists"}, status=400)
 
-        user = User(email=email, username=username)
+        user = User(email=email, username=username, phone_number=phone_number)
         user.set_password(password)
         user.save()
 
@@ -58,3 +59,17 @@ class UserInfo(APIView):
             return Response({'username': user.username},status=status.HTTP_200_OK)
          else:
              return Response({'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+class UserByPhoneView(APIView):
+    permission_classes = [AllowAny]  # For internal service communication
+    authentication_classes = []
+    def get(self, request):
+        phone_number = request.query_params.get('phone_number')
+        if not phone_number:
+            return Response({'error': 'Phone number is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = User.objects.filter(phone_number=phone_number).first()
+        if user:
+            return Response({'user_id': str(user.unique_id), 'username': user.username}, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
