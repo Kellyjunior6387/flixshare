@@ -183,8 +183,18 @@ const BillingPage: React.FC = () => {
     } catch (err) {
       console.error('Failed to load transactions:', err);
       setError('Failed to load transactions');
-      // Keep using mock data if API fails
-      setTransactions(mockTransactions as Transaction[]);
+      // Convert mock data to match Transaction interface
+      const convertedMockTransactions: Transaction[] = mockTransactions.map(tx => ({
+        id: tx.id,
+        phone_number: '254700000000', // Mock phone number
+        amount: tx.amount,
+        MpesaReceiptNumber: `MPE${tx.id}${Math.random().toString(36).substr(2, 5).toUpperCase()}`,
+        description: tx.description,
+        timestamp: tx.date + 'T00:00:00Z', // Convert date to timestamp format
+        status: tx.status === 'completed' ? 'successful' : tx.status as 'pending' | 'failed',
+        room_id: `room_${tx.id}`
+      }));
+      setTransactions(convertedMockTransactions);
     } finally {
       setTransactionsLoading(false);
     }

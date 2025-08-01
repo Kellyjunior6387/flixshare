@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8000'; // Room management service
-const AUTH_API_URL = 'http://localhost:8001'; // Auth service
+// const AUTH_API_URL = 'http://localhost:8001'; // Auth service - for future use
 
 export interface Transaction {
   id: number;
@@ -54,7 +54,7 @@ class PaymentService {
   }
 
   // Get user transactions (could be filtered by user ID if needed)
-  async getUserTransactions(userId?: string): Promise<Transaction[]> {
+  async getUserTransactions(): Promise<Transaction[]> {
     try {
       const response = await axios.get(`${API_BASE_URL}/payments/transactions/`);
       const transactions = response.data;
