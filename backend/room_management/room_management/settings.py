@@ -32,7 +32,10 @@ SECRET_KEY = 'django-insecure-)_9-#n8xgptp1wzxyrw-=b2&_c-ih@7k^yr9q6_y+sndy^_#yf
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '7333789a7d03.ngrok-free.app'
+]
 
 
 # Application definition
@@ -158,7 +161,6 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-        'rest_framework.permissions.AllowAny',
     ],
 }
 #MPESA CREDENTIALS
@@ -166,6 +168,6 @@ MPESA_CONSUMER_KEY = os.getenv("MPESA_CONSUMER_KEY")
 MPESA_CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET")
 MPESA_SHORTCODE = "174379"  # Or your registered shortcode
 MPESA_PASSKEY = os.getenv("MPESA_PASSKEY")
-MPESA_CALLBACK_URL = "https://webhook.site/a3ef4c6c-99c8-4bdf-bfa8-5c3fb09e8728"
+MPESA_CALLBACK_URL = os.getenv("MPESA_CALLBACK_URL")
 
 
