@@ -16,7 +16,7 @@ import {
     LinearProgress,
     CssBaseline
 } from '@mui/material';
-import { Visibility, VisibilityOff, Email, Lock, Person } from '@mui/icons-material';
+import { Visibility, VisibilityOff, Email, Lock, Person, Phone } from '@mui/icons-material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import authTheme from '../../theme/authTheme';
@@ -26,7 +26,8 @@ const Register: React.FC = () => {
     const [formData, setFormData] = useState({
         email: '',
         username: '',
-        password: ''
+        password: '',
+        phone_number: ''
     });
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
@@ -216,6 +217,27 @@ const Register: React.FC = () => {
                                             startAdornment: (
                                                 <InputAdornment position="start">
                                                     <Person sx={{ color: 'text.secondary' }} />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                        sx={{ mb: 2 }}
+                                    />
+
+                                    <TextField
+                                        margin="normal"
+                                        required
+                                        fullWidth
+                                        id="phone_number"
+                                        label="Phone Number"
+                                        name="phone_number"
+                                        autoComplete="tel"
+                                        placeholder="254XXXXXXXXX"
+                                        value={formData.phone_number}
+                                        onChange={handleChange}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Phone sx={{ color: 'text.secondary' }} />
                                                 </InputAdornment>
                                             ),
                                         }}

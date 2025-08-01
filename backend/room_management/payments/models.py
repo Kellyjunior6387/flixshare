@@ -15,7 +15,8 @@ class Transaction(models.Model):
     MpesaReceiptNumber = models.CharField(max_length=20, unique=True)  # e.g., MPESA123XYZ
     description = models.TextField(blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default="PENDING")  # e.g., PENDING, SUCCESS, FAILED
+    status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default="pending")  # e.g., PENDING, SUCCESS, FAILED
+    room_id = models.CharField(max_length=50, blank=True, null=True, help_text="Room ID for the payment")
 
     def __str__(self):
         return f"{self.phone_number} - {self.amount} KES"
