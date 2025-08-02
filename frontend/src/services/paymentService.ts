@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000'; // Room management service
+const API_BASE_URL = 'http://localhost:8080'; // Room management service
 // const AUTH_API_URL = 'http://localhost:8001'; // Auth service - for future use
 
 export interface Transaction {
@@ -17,7 +17,7 @@ export interface Transaction {
 export interface MpesaPaymentRequest {
   phone_number: string;
   amount: number;
-  room: string;
+  room_id: string;
 }
 
 export interface MpesaPaymentResponse {
@@ -41,7 +41,13 @@ class PaymentService {
   // Initiate MPESA STK Push
   async initiatePayment(paymentData: MpesaPaymentRequest): Promise<MpesaPaymentResponse> {
     try {
-      const response = await axios.post(`${API_BASE_URL}/payments/stk-push/`, paymentData);
+      console.log(paymentData)
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${API_BASE_URL}/payments/stk-push/`, paymentData, {
+              headers: {
+                        'Authorization': `Bearer ${token}`
+                      }
+      });
       return {
         success: true,
         message: 'Payment request sent successfully',

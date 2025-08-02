@@ -241,7 +241,7 @@ const BillingPage: React.FC = () => {
       const paymentRequest: MpesaPaymentRequest = {
         phone_number: phoneNumber,
         amount: Math.round(roomDetails.cost / roomDetails.member_count),
-        room: selectedRoom
+        room_id: selectedRoom
       };
 
       const response = await paymentService.initiatePayment(paymentRequest);

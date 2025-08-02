@@ -12,7 +12,7 @@ class Transaction(models.Model):
     ]
     phone_number = models.CharField(max_length=15)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    MpesaReceiptNumber = models.CharField(max_length=20, unique=True)  # e.g., MPESA123XYZ
+    MpesaReceiptNumber = models.CharField(max_length=20, unique=True, null=True, blank=True)  # e.g., MPESA123XYZ
     description = models.TextField(blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default="pending")  # e.g., PENDING, SUCCESS, FAILED
@@ -20,3 +20,11 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"{self.phone_number} - {self.amount} KES"
+
+class PaymentIntent(models.Model):
+    merchant_request_id = models.CharField(max_length=100, unique=True)
+    user_id = models.UUIDField()
+    room_id = models.UUIDField()
+    phone_number = models.CharField(max_length=15)
+    created_at = models.DateTimeField(auto_now_add=True)
+
