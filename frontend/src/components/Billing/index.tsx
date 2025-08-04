@@ -606,7 +606,7 @@ const BillingPage: React.FC = () => {
                                 primary={
                                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                                      {transaction.description || `Payment to ${transaction.phone_number}`}
+                                      {transaction.room_name || transaction.description || `Payment to ${transaction.phone_number}`}
                                     </Typography>
                                     <Typography variant="body1" sx={{ fontWeight: 600 }}>
                                       KSh {Number(transaction.amount).toLocaleString()}
