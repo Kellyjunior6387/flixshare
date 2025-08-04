@@ -39,12 +39,14 @@ import {
   ExitToApp as ExitToAppIcon,
   ContentCopy as ContentCopyIcon,
   PersonAdd as PersonAddIcon,
+  Payment as PaymentIcon,
 
   //Person as PersonIcon
 } from '@mui/icons-material';
 import { RoomDetailData } from './types';
 import axios from 'axios';
 import authTheme from '../../theme/authTheme';
+import TopBar from '../Dashboard/TopBar';
 
 const RoomDetail: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -181,6 +183,11 @@ const RoomDetail: React.FC = () => {
     }
   };
 
+  const handlePayNow = () => {
+    // Navigate to billing page with room context
+    navigate('/billing', { state: { roomId: room?.id, roomName: room?.name } });
+  };
+
   const fetchRoomDetails = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -245,7 +252,11 @@ const RoomDetail: React.FC = () => {
   return (
     <ThemeProvider theme={authTheme}>
       <CssBaseline />
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      
+      {/* Add TopBar */}
+      <TopBar showAddButton={false} />
+      
+      <Container maxWidth="lg" sx={{ py: 4, mt: 9 }}>
         <Box sx={{ py: 3 }}>
       {/* Back button and room title */}
       <Box sx={{ 
@@ -816,6 +827,45 @@ const RoomDetail: React.FC = () => {
             </Card>
           </Grid>
         </Grid>
+      </Paper>
+
+      {/* Pay Now Button */}
+      <Paper sx={{ 
+        mb: 4, 
+        p: 3, 
+        borderRadius: 4,
+        background: 'rgba(30, 41, 59, 0.8)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(148, 163, 184, 0.1)',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        '&:hover': {
+          background: 'rgba(30, 41, 59, 0.9)',
+          border: '1px solid rgba(148, 163, 184, 0.2)',
+        }
+      }}>
+        <Button
+          variant="contained"
+          size="large"
+          startIcon={<PaymentIcon />}
+          onClick={handlePayNow}
+          fullWidth
+          sx={{
+            borderRadius: 3,
+            py: 2.5,
+            fontSize: '1.2rem',
+            fontWeight: 600,
+            background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+            boxShadow: '0 10px 25px rgba(34, 197, 94, 0.4)',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #15803d 0%, #16a34a 100%)',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 15px 35px rgba(34, 197, 94, 0.5)',
+            },
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          }}
+        >
+          Pay Now - {individualCost.toFixed(2)} Ksh
+        </Button>
       </Paper>
 
       {/* Members List */}

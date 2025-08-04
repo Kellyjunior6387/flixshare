@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -103,6 +104,7 @@ const mockTransactions = [
 ];
 
 const BillingPage: React.FC = () => {
+  const location = useLocation();
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [paymentFormOpen, setPaymentFormOpen] = useState(false);
@@ -115,6 +117,14 @@ const BillingPage: React.FC = () => {
   // Get rooms and user data
   const { rooms, loading: roomsLoading } = useRooms();
   const { user, loading: userLoading } = useAuth();
+
+  // Handle room context from navigation state
+  useEffect(() => {
+    if (location.state?.roomId) {
+      setSelectedRoom(location.state.roomId);
+      setPaymentFormOpen(true); // Auto-open payment form if coming from room details
+    }
+  }, [location.state]);
 
   // Mock data for demo when API is not available
   const mockRooms = [
