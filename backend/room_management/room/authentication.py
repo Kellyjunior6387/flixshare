@@ -35,7 +35,6 @@ class JWTAuthentication(BaseAuthentication):
                         user = SimpleUser(user_id)
                         logger.info(f"User authenticated from cache: {user_id}")
                         return (user, token)
-            
             # If not in cache or Redis is unavailable, fetch from auth service
             response = requests.get(
                 'http://localhost:8000/auth/verify/',

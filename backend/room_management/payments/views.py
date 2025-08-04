@@ -64,7 +64,7 @@ class MpesaSTKPushView(APIView):
             "PartyB": settings.MPESA_SHORTCODE,
             "PhoneNumber": phone,
             "CallBackURL": settings.MPESA_CALLBACK_URL,
-            "AccountReference": room_id,
+            "AccountReference": room_name,
             "TransactionDesc": f"Payment of {room_name}"  # Updated transaction description
         }
         print(settings.MPESA_CALLBACK_URL)
