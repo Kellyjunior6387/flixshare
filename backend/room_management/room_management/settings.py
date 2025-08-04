@@ -34,7 +34,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
-    'e62308880ad2.ngrok-free.app',
+    '3052e48fc6bf.ngrok-free.app',
     '127.0.0.1'
 ]
 
@@ -171,5 +171,10 @@ MPESA_CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET")
 MPESA_SHORTCODE = "174379"  # Or your registered shortcode
 MPESA_PASSKEY = os.getenv("MPESA_PASSKEY")
 MPESA_CALLBACK_URL = os.getenv("MPESA_CALLBACK_URL").strip()
+
+#REDIS SETTINGS
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 0
 
 
