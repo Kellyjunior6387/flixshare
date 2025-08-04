@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -47,6 +47,7 @@ import theme from '../Dashboard/theme';
 import TopBar from '../Dashboard/TopBar';
 import { useRooms } from '../Dashboard/data';
 import { useAuth } from '../../utils/auth';
+import { paymentService, Transaction, MpesaPaymentRequest } from '../../services/paymentService';
 
 // Mock data for demonstration
 const mockCreditCards = [
@@ -107,6 +108,9 @@ const BillingPage: React.FC = () => {
   const [paymentFormOpen, setPaymentFormOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('');
   const [paymentState, setPaymentState] = useState<'idle' | 'processing' | 'success' | 'failed'>('idle');
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactionsLoading, setTransactionsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Get rooms and user data
   const { rooms, loading: roomsLoading } = useRooms();
@@ -165,6 +169,37 @@ const BillingPage: React.FC = () => {
     room.role === 'member'
   );
 
+  // Load transactions on component mount
+  useEffect(() => {
+    loadTransactions();
+  }, []);
+
+  const loadTransactions = async () => {
+    setTransactionsLoading(true);
+    try {
+      const data = await paymentService.getTransactions();
+      setTransactions(data);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to load transactions:', err);
+      setError('Failed to load transactions');
+      // Convert mock data to match Transaction interface
+      const convertedMockTransactions: Transaction[] = mockTransactions.map(tx => ({
+        id: tx.id,
+        phone_number: '254700000000', // Mock phone number
+        amount: tx.amount,
+        MpesaReceiptNumber: `MPE${tx.id}${Math.random().toString(36).substr(2, 5).toUpperCase()}`,
+        description: tx.description,
+        timestamp: tx.date + 'T00:00:00Z', // Convert date to timestamp format
+        status: tx.status === 'completed' ? 'successful' : tx.status as 'pending' | 'failed',
+        room_id: `room_${tx.id}`
+      }));
+      setTransactions(convertedMockTransactions);
+    } finally {
+      setTransactionsLoading(false);
+    }
+  };
+
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMenuAnchorEl(event.currentTarget);
   };
@@ -197,30 +232,35 @@ const BillingPage: React.FC = () => {
 
     setPaymentState('processing');
 
-    // Simulate payment processing with 1 minute timeout
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Payment timeout')), 60000); // 1 minute
-    });
-
-    const paymentPromise = new Promise((resolve) => {
-      // Simulate random success/failure for demo
-      setTimeout(() => {
-        const success = Math.random() > 0.3; // 70% success rate for demo
-        if (success) {
-          resolve('success');
-        } else {
-          throw new Error('Payment failed');
-        }
-      }, Math.random() * 5000 + 2000); // 2-7 seconds for demo
-    });
-
     try {
-      await Promise.race([paymentPromise, timeoutPromise]);
-      setPaymentState('success');
-      setTimeout(() => {
-        handleClosePaymentForm();
-      }, 3000); // Close after 3 seconds on success
+      const roomDetails = getSelectedRoomDetails();
+      if (!roomDetails) {
+        throw new Error('Room details not found');
+      }
+
+      const paymentRequest: MpesaPaymentRequest = {
+        phone_number: phoneNumber,
+        amount: Math.round(roomDetails.cost / roomDetails.member_count),
+        room_id: selectedRoom
+      };
+
+      const response = await paymentService.initiatePayment(paymentRequest);
+      
+      if (response.success) {
+        setPaymentState('success');
+        // Reload transactions to show the new pending payment
+        loadTransactions();
+        setTimeout(() => {
+          handleClosePaymentForm();
+        }, 3000); // Close after 3 seconds on success
+      } else {
+        setPaymentState('failed');
+        setTimeout(() => {
+          setPaymentState('idle');
+        }, 5000);
+      }
     } catch (error) {
+      console.error('Payment failed:', error);
       setPaymentState('failed');
       setTimeout(() => {
         setPaymentState('idle');
@@ -234,7 +274,7 @@ const BillingPage: React.FC = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'completed':
+      case 'successful':
         return <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />;
       case 'pending':
         return <PendingIcon sx={{ color: 'warning.main', fontSize: 20 }} />;
@@ -247,7 +287,7 @@ const BillingPage: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
+      case 'successful':
         return 'success';
       case 'pending':
         return 'warning';
@@ -510,63 +550,92 @@ const BillingPage: React.FC = () => {
                         variant="text"
                         endIcon={<ReceiptIcon />}
                         sx={{ color: 'text.secondary' }}
+                        onClick={loadTransactions}
                       >
-                        Export
+                        Refresh
                       </Button>
                     </Box>
 
+                    {error && (
+                      <Alert severity="warning" sx={{ mb: 2 }}>
+                        {error}. Showing cached data.
+                      </Alert>
+                    )}
+
                     <List sx={{ width: '100%' }}>
-                      {mockTransactions.map((transaction, index) => (
-                        <React.Fragment key={transaction.id}>
-                          <ListItem
-                            sx={{
-                              px: 0,
-                              py: 2,
-                              '&:hover': {
-                                background: 'rgba(255, 255, 255, 0.02)',
-                                borderRadius: '8px',
-                              },
-                            }}
-                          >
-                            <ListItemIcon>
-                              {getStatusIcon(transaction.status)}
-                            </ListItemIcon>
-                            <ListItemText
-                              primary={
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                                    {transaction.description}
-                                  </Typography>
-                                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                                    KSh {transaction.amount.toLocaleString()}
-                                  </Typography>
-                                </Box>
-                              }
-                              secondary={
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                      {new Date(transaction.date).toLocaleDateString()}
+                      {transactionsLoading ? (
+                        <Box sx={{ textAlign: 'center', py: 4 }}>
+                          <CircularProgress />
+                          <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
+                            Loading transactions...
+                          </Typography>
+                        </Box>
+                      ) : transactions.length === 0 ? (
+                        <Box sx={{ textAlign: 'center', py: 4 }}>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            No transactions found
+                          </Typography>
+                        </Box>
+                      ) : (
+                        transactions.map((transaction, index) => (
+                          <React.Fragment key={transaction.id}>
+                            <ListItem
+                              sx={{
+                                px: 0,
+                                py: 2,
+                                '&:hover': {
+                                  background: 'rgba(255, 255, 255, 0.02)',
+                                  borderRadius: '8px',
+                                },
+                              }}
+                            >
+                              <ListItemIcon>
+                                {getStatusIcon(transaction.status)}
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={
+                                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                                      {transaction.description || `Payment to ${transaction.phone_number}`}
                                     </Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                      • {transaction.method}
+                                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                                      KSh {Number(transaction.amount).toLocaleString()}
                                     </Typography>
                                   </Box>
-                                  <Chip
-                                    label={transaction.status}
-                                    size="small"
-                                    color={getStatusColor(transaction.status) as 'success' | 'warning' | 'error'}
-                                    sx={{ textTransform: 'capitalize' }}
-                                  />
-                                </Box>
-                              }
-                            />
-                          </ListItem>
-                          {index < mockTransactions.length - 1 && (
-                            <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
-                          )}
-                        </React.Fragment>
-                      ))}
+                                }
+                                secondary={
+                                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                        {new Date(transaction.timestamp).toLocaleDateString()}
+                                      </Typography>
+                                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                        • M-Pesa
+                                      </Typography>
+                                      {transaction.MpesaReceiptNumber && transaction.MpesaReceiptNumber !== 'N/A' && (
+                                        <>
+                                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                            • {transaction.MpesaReceiptNumber}
+                                          </Typography>
+                                        </>
+                                      )}
+                                    </Box>
+                                    <Chip
+                                      label={transaction.status}
+                                      size="small"
+                                      color={getStatusColor(transaction.status) as 'success' | 'warning' | 'error'}
+                                      sx={{ textTransform: 'capitalize' }}
+                                    />
+                                  </Box>
+                                }
+                              />
+                            </ListItem>
+                            {index < transactions.length - 1 && (
+                              <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+                            )}
+                          </React.Fragment>
+                        ))
+                      )}
                     </List>
                   </CardContent>
                 </Card>

@@ -1,27 +1,29 @@
 import requests
 import base64
 import json
+from django.utils import timezone
 from datetime import datetime
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-from .models import Transaction
+from .models import Transaction, PaymentIntent
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.generics import ListAPIView
 from .serializers import TransactionSerializer
-
+from room.models import Room, RoomMember    
+import uuid
 
 class MpesaSTKPushView(APIView):
-    permission_classes = [AllowAny]
     def post(self, request):
         phone = request.data.get("phone_number")
         amount = request.data.get("amount")
-        room = request.data.get("room")
+        room_id = request.data.get("room_id")
+        user_id = request.user.id
 
-        if not phone or not amount or not room:
+        if not phone or not amount or not room_id:
             return Response({"error": "Missing required fields"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Step 1: Generate Access Token
@@ -30,7 +32,7 @@ class MpesaSTKPushView(APIView):
         token_response = requests.request("GET", 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', 
                                           headers = { 'Authorization': f'Basic {encoded_data}' })
         access_token = token_response.json().get("access_token")
-       
+      
          # Step 2: Prepare STK Push Payload
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         password_str = f"{settings.MPESA_SHORTCODE}{settings.MPESA_PASSKEY}{timestamp}"
@@ -50,14 +52,20 @@ class MpesaSTKPushView(APIView):
             "PartyB": settings.MPESA_SHORTCODE,
             "PhoneNumber": phone,
             "CallBackURL": settings.MPESA_CALLBACK_URL,
-            "AccountReference": 'room',
-            "TransactionDesc": f"Payment of {room}"
+            "AccountReference": room_id,
+            "TransactionDesc": f"Payment for room {room_id}"
         }
-
+        print(settings.MPESA_CALLBACK_URL)
         stk_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
         response = requests.post(stk_url, headers = headers, json = payload)
-
-
+        if response.status_code == 200:
+            merchant_request_id = response.json().get('MerchantRequestID')
+            PaymentIntent.objects.create(
+                merchant_request_id=merchant_request_id,
+                user_id=user_id,
+                room_id=room_id,
+                phone_number=phone
+            )
         return Response(response.json(), status=response.status_code)
 @method_decorator(csrf_exempt, name='dispatch')
 class MpesaCallbackView(APIView):
@@ -69,9 +77,9 @@ class MpesaCallbackView(APIView):
         try:
             data = json.loads(request.body)
             stk_callback = data.get("Body", {}).get("stkCallback", {})
-
             result_code = stk_callback.get("ResultCode")
             result_desc = stk_callback.get("ResultDesc")
+            merchant_request_id = stk_callback.get("MerchantRequestID")
             metadata = stk_callback.get("CallbackMetadata", {}).get("Item", []) if result_code == 0 else []
 
             amount = MpesaReceiptNumber = phone_number = transaction_date = None
@@ -85,20 +93,57 @@ class MpesaCallbackView(APIView):
                         phone_number = item['Value']
                     elif item['Name'] == 'TransactionDate':
                         transaction_date = item['Value']
-            status_value = 'SUCCESS' if result_code == 0 else 'FAILED'
-            Transaction.objects.create(
-                phone_number=phone_number or 'Unknown',
-                amount=amount or 0,
-                MpesaReceiptNumber=MpesaReceiptNumber or 'N/A',
-                status=status_value,
-                description=result_desc,
-                timestamp=transaction_date
-            )
-            return Response({'message': 'Callback processed'}, status=status.HTTP_200_OK)
+    
+                try:
+                    intent = PaymentIntent.objects.get(merchant_request_id=merchant_request_id)
+                    print(intent.phone_number, intent.user_id, intent.user_id)
+                except PaymentIntent.DoesNotExist:
+                    print(f'UNKNOWN')
+                    return Response({"error": "Unknown MerchantRequestID"}, status=400)
+                
+                # Create transaction record
+                transaction = Transaction.objects.create(
+                    phone_number=phone_number or 'Unknown',
+                    amount=amount or 0,
+                    MpesaReceiptNumber=MpesaReceiptNumber,
+                    status='SUCCESS',
+                    description=result_desc,
+                    timestamp=transaction_date,
+                    room_id=intent.room_id
+                )
+                
+                # Update room member payment status if payment was successful
+                if result_code == 0 and intent.room_id and phone_number:
+                    self.update_room_payment_status(intent.room_id, intent.user_id)
+                
+                return Response({'message': 'Callback processed'}, status=status.HTTP_200_OK)
+            return Response({'message': 'Payment failed or Cancellled by user'}, status=status.HTTP_200_OK)
 
         except Exception as e:
             print(e)
             return Response({"error":str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def update_room_payment_status(self, room_id, user_id):
+        """Update the payment status for the room member based on phone number"""
+        try:
+            try:
+                room = Room.objects.get(room_id=room_id)
+            except Room.DoesNotExist:
+                print(f"Room not found: {room_id}")
+                return
+            
+            # Update room member payment status
+            try:
+                room_member = RoomMember.objects.get(room=room, user_id=user_id)
+                room_member.payment_status = 'paid'
+                room_member.last_payment_date = timezone.now()
+                room_member.save()
+                print(f"Updated payment status for user {user_id} in room {room_id}")
+            except RoomMember.DoesNotExist:
+                print(f"Room member not found: user {user_id} in room {room_id}")
+                
+        except Exception as e:
+            print(f"Error updating room payment status: {e}")
         
 
 

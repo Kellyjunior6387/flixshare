@@ -34,7 +34,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
-    '7333789a7d03.ngrok-free.app'
+    'e62308880ad2.ngrok-free.app',
+    '127.0.0.1'
 ]
 
 
@@ -127,6 +128,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+APPEND_SLASH=False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -168,6 +170,6 @@ MPESA_CONSUMER_KEY = os.getenv("MPESA_CONSUMER_KEY")
 MPESA_CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET")
 MPESA_SHORTCODE = "174379"  # Or your registered shortcode
 MPESA_PASSKEY = os.getenv("MPESA_PASSKEY")
-MPESA_CALLBACK_URL = os.getenv("MPESA_CALLBACK_URL")
+MPESA_CALLBACK_URL = os.getenv("MPESA_CALLBACK_URL").strip()
 
 
