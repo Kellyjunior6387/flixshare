@@ -15,6 +15,7 @@ from rest_framework.generics import ListAPIView
 from .serializers import TransactionSerializer
 from room.models import Room, RoomMember    
 import uuid
+from .utils import set_payment_intent, get_payment_intent
 
 class MpesaSTKPushView(APIView):
     def post(self, request):
@@ -60,6 +61,14 @@ class MpesaSTKPushView(APIView):
         response = requests.post(stk_url, headers = headers, json = payload)
         if response.status_code == 200:
             merchant_request_id = response.json().get('MerchantRequestID')
+
+            #Store the details in redis
+            set_payment_intent(merchant_request_id,{
+                               "user_id":user_id,
+                                "room_id":room_id,
+                                "phone_number":phone})
+            
+            #Store the details in the DB
             PaymentIntent.objects.create(
                 merchant_request_id=merchant_request_id,
                 user_id=user_id,
@@ -94,12 +103,14 @@ class MpesaCallbackView(APIView):
                     elif item['Name'] == 'TransactionDate':
                         transaction_date = item['Value']
     
-                try:
-                    intent = PaymentIntent.objects.get(merchant_request_id=merchant_request_id)
-                    print(intent.phone_number, intent.user_id, intent.user_id)
-                except PaymentIntent.DoesNotExist:
-                    print(f'UNKNOWN')
-                    return Response({"error": "Unknown MerchantRequestID"}, status=400)
+                intent = get_payment_intent(merchant_request_id)
+
+                if not intent:
+                    return Response({"error": "Unknown MerchantRequestID"}, status=404)
+
+                user_id = intent["user_id"]
+                room_id = intent["room_id"]
+                phone = intent["phone_number"]
                 
                 # Create transaction record
                 transaction = Transaction.objects.create(
@@ -109,12 +120,12 @@ class MpesaCallbackView(APIView):
                     status='SUCCESS',
                     description=result_desc,
                     timestamp=transaction_date,
-                    room_id=intent.room_id
+                    room_id=room_id
                 )
                 
                 # Update room member payment status if payment was successful
-                if result_code == 0 and intent.room_id and phone_number:
-                    self.update_room_payment_status(intent.room_id, intent.user_id)
+                if result_code == 0 and room_id and phone:
+                    self.update_room_payment_status(room_id, user_id)
                 
                 return Response({'message': 'Callback processed'}, status=status.HTTP_200_OK)
             return Response({'message': 'Payment failed or Cancellled by user'}, status=status.HTTP_200_OK)
