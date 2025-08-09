@@ -16,6 +16,9 @@ from .serializers import TransactionSerializer
 from room.models import Room, RoomMember    
 import uuid
 from .utils import set_payment_intent, get_payment_intent
+import logging
+
+logger = logging.getLogger(__name__)
 
 class MpesaSTKPushView(APIView):
     def post(self, request):
@@ -26,6 +29,14 @@ class MpesaSTKPushView(APIView):
 
         if not phone or not amount or not room_id:
             return Response({"error": "Missing required fields"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get room name for transaction description
+        room_name = "Unknown Room"
+        try:
+            room = Room.objects.get(room_id=room_id)
+            room_name = room.name
+        except Room.DoesNotExist:
+            logger.warning(f"Room not found for ID: {room_id}")
 
         # Step 1: Generate Access Token
         data_to_encode = f"{settings.MPESA_CONSUMER_KEY}:{settings.MPESA_CONSUMER_SECRET}"
@@ -54,7 +65,7 @@ class MpesaSTKPushView(APIView):
             "PhoneNumber": phone,
             "CallBackURL": settings.MPESA_CALLBACK_URL,
             "AccountReference": room_id,
-            "TransactionDesc": f"Payment for room {room_id}"
+            "TransactionDesc": f"Payment of {room_name}"  # Updated transaction description
         }
         print(settings.MPESA_CALLBACK_URL)
         stk_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
@@ -62,10 +73,11 @@ class MpesaSTKPushView(APIView):
         if response.status_code == 200:
             merchant_request_id = response.json().get('MerchantRequestID')
 
-            #Store the details in redis
+            #Store the details in redis with room_name
             set_payment_intent(merchant_request_id,{
                                "user_id":user_id,
                                 "room_id":room_id,
+                                "room_name":room_name,  # Added room_name to cache
                                 "phone_number":phone})
             
             #Store the details in the DB
@@ -110,6 +122,7 @@ class MpesaCallbackView(APIView):
 
                 user_id = intent["user_id"]
                 room_id = intent["room_id"]
+                room_name = intent.get("room_name", "Unknown Room")  # Get room_name from cache
                 phone = intent["phone_number"]
                 
                 # Create transaction record
@@ -117,8 +130,9 @@ class MpesaCallbackView(APIView):
                     phone_number=phone_number or 'Unknown',
                     amount=amount or 0,
                     MpesaReceiptNumber=MpesaReceiptNumber,
-                    status='SUCCESS',
+                    status='successful',  # Changed back to 'successful'
                     description=result_desc,
+                    room_name=room_name,  # Store room_name in transaction
                     timestamp=transaction_date,
                     room_id=room_id
                 )

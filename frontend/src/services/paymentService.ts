@@ -9,8 +9,9 @@ export interface Transaction {
   amount: number;
   MpesaReceiptNumber: string;
   description: string;
+  room_name?: string;  // Added room_name field
   timestamp: string;
-  status: 'pending' | 'successful' | 'failed';
+  status: 'pending' | 'successful' | 'failed';  // Changed 'successful' back from 'SUCCESS'
   room_id?: string;
 }
 
