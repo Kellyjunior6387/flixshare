@@ -186,7 +186,10 @@ const TopBar: React.FC<TopBarProps> = ({ showAddButton = true, onAddClick }) => 
         </Box>
         
         <MenuItem 
-          onClick={handleProfileMenuClose}
+          onClick={() => {
+            navigate('/profile');
+            handleProfileMenuClose();
+          }}
           sx={{ 
             py: 1.5,
             '&:hover': {
