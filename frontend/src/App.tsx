@@ -8,6 +8,7 @@ import PrivateRoute from "./components/Auth/PrivateRoute";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/signUp";
 import ResetPassword from "./components/Auth/ResetPassword";
+import OtpVerification from "./components/Auth/OtpVerification";
 
 function App() {
     return (
@@ -20,6 +21,7 @@ function App() {
                         <Route path="/auth/login" element={<Login/>} />
                         <Route path="/auth/register" element={<Register />} />
                         <Route path="/auth/reset-password" element={<ResetPassword />} />
+                        <Route path="/auth/verify-otp" element={<OtpVerification email="" purpose="signup" />} />
                         
                         {/* Protected Routes */}
                         <Route

@@ -1,6 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { signOut } from "supertokens-auth-react/recipe/session";
-import { recipeDetails } from "../../config";
 import CallAPIView from "./CallAPIView";
 import { BlogsIcon, CelebrateIcon, GuideIcon, SeparatorLine, SignOutIcon } from "../../assets/images";
 
@@ -16,8 +14,9 @@ export default function SuccessView(props: { userId: string }) {
     const navigate = useNavigate();
 
     async function logoutClicked() {
-        await signOut();
-        navigate("/auth");
+        // Simple logout - remove token and redirect
+        localStorage.removeItem('token');
+        navigate("/auth/login");
     }
 
     function openLink(url: string) {
@@ -27,12 +26,12 @@ export default function SuccessView(props: { userId: string }) {
     const links: ILink[] = [
         {
             name: "Blogs",
-            onClick: () => openLink("https://supertokens.com/blog"),
+            onClick: () => openLink("https://flixshare.com/blog"),
             icon: BlogsIcon,
         },
         {
             name: "Documentation",
-            onClick: () => openLink(recipeDetails.docsLink),
+            onClick: () => openLink("https://flixshare.com/docs"),
             icon: GuideIcon,
         },
         {

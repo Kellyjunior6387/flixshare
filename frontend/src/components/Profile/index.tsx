@@ -222,7 +222,7 @@ const Profile: React.FC = () => {
 
                         <Grid container spacing={4}>
                             {/* Profile Information Card */}
-                            <Grid item xs={12} md={8}>
+                            <Grid item xs={12}>
                                 <Card sx={{ height: 'fit-content' }}>
                                     <CardContent sx={{ p: 4 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
@@ -365,66 +365,64 @@ const Profile: React.FC = () => {
                                                     </Box>
                                                 )}
                                             </Grid>
+
+                                            {/* Password Change Section */}
+                                            <Grid item xs={12}>
+                                                <Divider sx={{ my: 3, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+                                                
+                                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                                                    <LockIcon sx={{ color: 'text.secondary', mr: 2 }} />
+                                                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                                        Security
+                                                    </Typography>
+                                                </Box>
+
+                                                <Paper 
+                                                    sx={{ 
+                                                        p: 3, 
+                                                        borderRadius: '12px',
+                                                        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.02) 100%)',
+                                                        border: '1px solid rgba(99, 102, 241, 0.1)',
+                                                        mb: 2,
+                                                    }}
+                                                >
+                                                    <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
+                                                        Password
+                                                    </Typography>
+                                                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
+                                                        Last updated 30 days ago
+                                                    </Typography>
+                                                    <Button
+                                                        variant="outlined"
+                                                        fullWidth
+                                                        onClick={() => setIsPasswordDialogOpen(true)}
+                                                        sx={{
+                                                            borderColor: 'rgba(99, 102, 241, 0.5)',
+                                                            color: '#6366f1',
+                                                            '&:hover': {
+                                                                borderColor: '#6366f1',
+                                                                background: 'rgba(99, 102, 241, 0.1)',
+                                                            },
+                                                        }}
+                                                    >
+                                                        Change Password
+                                                    </Button>
+                                                </Paper>
+
+                                                <Alert 
+                                                    severity="info"
+                                                    sx={{
+                                                        background: 'rgba(59, 130, 246, 0.1)',
+                                                        border: '1px solid rgba(59, 130, 246, 0.2)',
+                                                        '& .MuiAlert-icon': {
+                                                            color: '#3b82f6',
+                                                        },
+                                                    }}
+                                                >
+                                                    Keep your account secure by using a strong password and updating it regularly.
+                                                </Alert>
+                                            </Grid>
                                         </Grid>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-
-                            {/* Security Settings Card */}
-                            <Grid item xs={12} md={4}>
-                                <Card sx={{ height: 'fit-content' }}>
-                                    <CardContent sx={{ p: 3 }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                                            <LockIcon sx={{ color: 'text.secondary', mr: 2 }} />
-                                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                                Security
-                                            </Typography>
-                                        </Box>
-
-                                        <Paper 
-                                            sx={{ 
-                                                p: 3, 
-                                                borderRadius: '12px',
-                                                background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.02) 100%)',
-                                                border: '1px solid rgba(99, 102, 241, 0.1)',
-                                                mb: 3,
-                                            }}
-                                        >
-                                            <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
-                                                Password
-                                            </Typography>
-                                            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
-                                                Last updated 30 days ago
-                                            </Typography>
-                                            <Button
-                                                variant="outlined"
-                                                fullWidth
-                                                onClick={() => setIsPasswordDialogOpen(true)}
-                                                sx={{
-                                                    borderColor: 'rgba(99, 102, 241, 0.5)',
-                                                    color: '#6366f1',
-                                                    '&:hover': {
-                                                        borderColor: '#6366f1',
-                                                        background: 'rgba(99, 102, 241, 0.1)',
-                                                    },
-                                                }}
-                                            >
-                                                Change Password
-                                            </Button>
-                                        </Paper>
-
-                                        <Alert 
-                                            severity="info"
-                                            sx={{
-                                                background: 'rgba(59, 130, 246, 0.1)',
-                                                border: '1px solid rgba(59, 130, 246, 0.2)',
-                                                '& .MuiAlert-icon': {
-                                                    color: '#3b82f6',
-                                                },
-                                            }}
-                                        >
-                                            Keep your account secure by using a strong password and updating it regularly.
-                                        </Alert>
                                     </CardContent>
                                 </Card>
                             </Grid>

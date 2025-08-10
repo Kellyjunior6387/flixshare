@@ -15,7 +15,6 @@ import {
   Add as AddIcon,
   ExitToApp as ExitToAppIcon,
   Person as PersonIcon,
-  Settings as SettingsIcon,
   Payment as PaymentIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -219,21 +218,6 @@ const TopBar: React.FC<TopBarProps> = ({ showAddButton = true, onAddClick }) => 
             <PaymentIcon sx={{ color: 'text.secondary' }} />
           </ListItemIcon>
           Billing & Payments
-        </MenuItem>
-        
-        <MenuItem 
-          onClick={handleProfileMenuClose}
-          sx={{ 
-            py: 1.5,
-            '&:hover': {
-              background: 'rgba(99, 102, 241, 0.1)',
-            },
-          }}
-        >
-          <ListItemIcon>
-            <SettingsIcon sx={{ color: 'text.secondary' }} />
-          </ListItemIcon>
-          Settings
         </MenuItem>
         
         <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
