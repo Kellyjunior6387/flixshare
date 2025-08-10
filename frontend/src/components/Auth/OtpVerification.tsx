@@ -97,7 +97,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
         setIsLoading(true);
 
         try {
-            const response = await axios.post(
+            await axios.post(
                 'http://localhost:8000/auth/verify-signup-otp/',
                 {
                     email: emailToUse,
