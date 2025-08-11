@@ -5,6 +5,12 @@ import aiosmtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import asyncio
+from django.core.mail import send_mail
+from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 SECRET_KEY = settings.SECRET_KEY
 # Create your views here.
@@ -32,31 +38,20 @@ def send_email(to_email, subject, body):
     For now, this is a placeholder that prints the email content
     """
     try:
+        send_mail(
+            subject=subject,
+            message=body,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list= [to_email],
+            fail_silently=False
+        )
+        logger.info("Email sent to %s", to_email)
         # For development/testing, just print the email content
         print(f"\n=== EMAIL SENT ===")
         print(f"To: {to_email}")
         print(f"Subject: {subject}")
         print(f"Body: {body}")
         print(f"==================\n")
-        
-        # In production, replace the above with actual email sending logic:
-        # message = MIMEMultipart()
-        # message["From"] = settings.EMAIL_HOST_USER
-        # message["To"] = to_email
-        # message["Subject"] = subject
-        # message.attach(MIMEText(body, "plain"))
-        
-        # async def send_async():
-        #     await aiosmtplib.send(
-        #         message,
-        #         hostname=settings.EMAIL_HOST,
-        #         port=settings.EMAIL_PORT,
-        #         username=settings.EMAIL_HOST_USER,
-        #         password=settings.EMAIL_HOST_PASSWORD,
-        #         use_tls=True,
-        #     )
-        
-        # asyncio.run(send_async())
         return True
         
     except Exception as e:

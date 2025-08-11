@@ -17,6 +17,7 @@ from supertokens_python import get_all_cors_headers
 from typing import List
 from auth_services.config import supertokens_config, app_info, recipe_list
 from corsheaders.defaults import default_headers
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -167,3 +168,11 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_HEADERS: List[str] = list(default_headers) + [
     "Content-Type"
 ] + get_all_cors_headers()
+
+#EMAILS CONFIG
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True       # for port 587
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
