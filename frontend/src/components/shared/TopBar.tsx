@@ -79,7 +79,7 @@ const TopBar: React.FC<TopBarProps> = ({ showAddButton = true, onAddClick }) => 
               border: '1px solid rgba(99, 102, 241, 0.2)',
             }}>
               <img
-                src="/favicon.svg"
+                src="/favicon.ico"
                 alt="Flixshare Logo"
                 style={{ height: 28, width: 28 }}
               />
