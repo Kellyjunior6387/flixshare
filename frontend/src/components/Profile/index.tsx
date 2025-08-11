@@ -34,7 +34,7 @@ import {
 } from '@mui/icons-material';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../Dashboard/theme';
-import TopBar from '../Dashboard/TopBar';
+import TopBar from '../shared/TopBar';
 import { useAuth } from '../../utils/auth';
 import axios from 'axios';
 

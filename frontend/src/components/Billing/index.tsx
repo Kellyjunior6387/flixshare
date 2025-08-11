@@ -45,7 +45,7 @@ import {
 } from '@mui/icons-material';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../Dashboard/theme';
-import TopBar from '../Dashboard/TopBar';
+import TopBar from '../shared/TopBar';
 import { useRooms } from '../Dashboard/data';
 import { useAuth } from '../../utils/auth';
 import { paymentService, Transaction, MpesaPaymentRequest } from '../../services/paymentService';

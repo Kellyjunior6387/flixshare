@@ -46,7 +46,7 @@ import {
 import { RoomDetailData } from './types';
 import axios from 'axios';
 import authTheme from '../../theme/authTheme';
-import TopBar from '../Dashboard/TopBar';
+import TopBar from '../shared/TopBar';
 
 const RoomDetail: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
