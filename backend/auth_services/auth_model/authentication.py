@@ -27,7 +27,6 @@ class JWTAuthentication(BaseAuthentication):
                 raise AuthenticationFailed('Invalid user ID format')
             # Retrieve user from the database
             user = User.objects.filter(unique_id=user_uuid).first()
-            print(user)
             if not user:
                 raise AuthenticationFailed('User not found')
             return (user, None)  # Authenticated user

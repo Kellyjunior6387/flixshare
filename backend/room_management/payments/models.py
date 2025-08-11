@@ -18,6 +18,7 @@ class Transaction(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default="pending")  # e.g., PENDING, SUCCESSFUL, FAILED
     room_id = models.CharField(max_length=50, blank=True, null=True, help_text="Room ID for the payment")
+    user_id = models.CharField(max_length=50,blank=True, null=True, help_text="User id for the payer")
 
     def __str__(self):
         return f"{self.phone_number} - {self.amount} KES"
