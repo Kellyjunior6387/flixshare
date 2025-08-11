@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'supertokens_python',
     'rest_framework',
     'corsheaders',
+    
 ]
 
 MIDDLEWARE = [
@@ -113,6 +114,12 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.github.GithubOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'auth_model.authentication.JWTAuthentication', 
@@ -176,3 +183,13 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True       # for port 587
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+#GOOGLE OAUTH CONFIG
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+
+#GITHUB OAUTH CONFIG
+GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
+GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+
+OAUTH_CALLBACK_URI = os.getenv('OATH_CALLBACK_URI')

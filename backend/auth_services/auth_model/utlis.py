@@ -15,6 +15,22 @@ logger = logging.getLogger(__name__)
 SECRET_KEY = settings.SECRET_KEY
 # Create your views here.
 
+GOOGLE_AUTH_URL = (
+    "https://accounts.google.com/o/oauth2/v2/auth"
+    "?client_id={client_id}"
+    "&redirect_uri={redirect_uri}"
+    "&response_type=code"
+    "&scope=email profile"
+)
+
+GITHUB_AUTH_URL = (
+    "https://github.com/login/oauth/authorize"
+    "?client_id={client_id}"
+    "&redirect_uri={redirect_uri}"
+    "&scope=read:user user:email"
+)
+
+
 def generate_jwt(user_id):
     payload = {
         "user_id": str(user_id),

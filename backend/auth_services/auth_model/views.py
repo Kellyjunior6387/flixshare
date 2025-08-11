@@ -6,7 +6,10 @@ from .utlis import generate_jwt, verify_jwt, send_email
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from django.utils import timezone
+from .utlis import GOOGLE_AUTH_URL, GITHUB_AUTH_URL
+from django.conf import settings
 
+API_URL = settings.OAUTH_CALLBACK_URI
 class RegisterView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
@@ -311,3 +314,23 @@ class ResetPasswordView(APIView):
         otp_obj.save()
         
         return Response({'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
+
+class GoogleLoginView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    def get(self, request):
+        url = GOOGLE_AUTH_URL.format(
+            client_id=settings.GOOGLE_CLIENT_ID,
+            redirect_uri=f'{API_URL}/auth/google/callback'
+        )
+        return Response({"auth_url": url}, status=status.HTTP_200_OK)
+
+class GithubLoginView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    def get(self, request):
+        url = GITHUB_AUTH_URL.format(
+            client_id=settings.GITHUB_CLIENT_ID,
+            redirect_uri=f"{API_URL}/auth/github/callback"
+        )
+        return Response ({'auth_url': url}, status=status.HTTP_200_OK)
