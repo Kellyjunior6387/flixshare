@@ -24,5 +24,5 @@ urlpatterns = [
 
     #OAUTH endpoints
     path('google/login/', GoogleLoginView.as_view(), name='google-login'),
-    path('github/login', GithubLoginView.as_view(), name='github-login'),
+    path('github/login/', GithubLoginView.as_view(), name='github-login'),
 ]  
