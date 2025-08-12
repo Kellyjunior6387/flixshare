@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Box, 
     TextField, 
@@ -13,22 +13,33 @@ import {
     Slide,
     Fade,
     ThemeProvider,
-    CssBaseline
+    CssBaseline,
+    Divider,
+    Grid
 } from '@mui/material';
-import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
+import { Visibility, VisibilityOff, Email, Lock, Google, GitHub } from '@mui/icons-material';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import authTheme from '../../theme/authTheme';
 
 const Login: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
     });
     const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        // Check if there's a success message from email verification
+        if (location.state?.message) {
+            setSuccessMessage(location.state.message);
+        }
+    }, [location]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -67,6 +78,12 @@ const Login: React.FC = () => {
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
+    };
+
+    const handleOAuthSignIn = async (providerId: string) => {
+        // OAuth functionality will be implemented later
+        console.log(`${providerId} OAuth sign in - to be implemented`);
+        setError(`${providerId} OAuth sign in will be available soon`);
     };
 
     return (
@@ -215,7 +232,7 @@ const Login: React.FC = () => {
                                         variant="contained"
                                         disabled={isLoading}
                                         sx={{ 
-                                            mb: 3,
+                                            mb: 2,
                                             py: 1.5,
                                             fontSize: '1rem',
                                             position: 'relative',
@@ -224,6 +241,91 @@ const Login: React.FC = () => {
                                     >
                                         {isLoading ? 'Signing In...' : 'Sign In'}
                                     </Button>
+
+                                    {/* Forgot Password Link */}
+                                    <Box sx={{ textAlign: 'center', mb: 3 }}>
+                                        <Button
+                                            variant="text"
+                                            onClick={() => navigate('/auth/reset-password')}
+                                            sx={{ 
+                                                fontSize: '0.9rem',
+                                                color: 'text.secondary',
+                                                '&:hover': {
+                                                    color: 'primary.main',
+                                                    textDecoration: 'underline',
+                                                }
+                                            }}
+                                        >
+                                            Forgot your password?
+                                        </Button>
+                                    </Box>
+
+                                    {/* OAuth Divider */}
+                                    <Box sx={{ my: 3 }}>
+                                        <Divider sx={{ 
+                                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                                            '&::before, &::after': {
+                                                borderColor: 'rgba(255, 255, 255, 0.1)',
+                                            }
+                                        }}>
+                                            <Typography 
+                                                variant="body2" 
+                                                sx={{ 
+                                                    color: 'text.secondary',
+                                                    px: 2,
+                                                    fontSize: '0.85rem'
+                                                }}
+                                            >
+                                                Or continue with
+                                            </Typography>
+                                        </Divider>
+                                    </Box>
+
+                                    {/* OAuth Buttons */}
+                                    <Grid container spacing={2} sx={{ mb: 3 }}>
+                                        <Grid item xs={6}>
+                                            <Button
+                                                fullWidth
+                                                variant="outlined"
+                                                onClick={() => handleOAuthSignIn('google')}
+                                                disabled={isLoading}
+                                                startIcon={<Google />}
+                                                sx={{
+                                                    py: 1.2,
+                                                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                                                    color: 'text.primary',
+                                                    '&:hover': {
+                                                        borderColor: '#db4437',
+                                                        background: 'rgba(219, 68, 55, 0.1)',
+                                                        color: '#db4437',
+                                                    },
+                                                }}
+                                            >
+                                                Google
+                                            </Button>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Button
+                                                fullWidth
+                                                variant="outlined"
+                                                onClick={() => handleOAuthSignIn('github')}
+                                                disabled={isLoading}
+                                                startIcon={<GitHub />}
+                                                sx={{
+                                                    py: 1.2,
+                                                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                                                    color: 'text.primary',
+                                                    '&:hover': {
+                                                        borderColor: '#333',
+                                                        background: 'rgba(51, 51, 51, 0.1)',
+                                                        color: '#333',
+                                                    },
+                                                }}
+                                            >
+                                                GitHub
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
 
                                     <Box sx={{ textAlign: 'center' }}>
                                         <Typography 
@@ -266,6 +368,21 @@ const Login: React.FC = () => {
                         sx={{ width: '100%' }}
                     >
                         {error}
+                    </Alert>
+                </Snackbar>
+
+                <Snackbar 
+                    open={!!successMessage} 
+                    autoHideDuration={6000} 
+                    onClose={() => setSuccessMessage(null)}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                >
+                    <Alert 
+                        severity="success" 
+                        onClose={() => setSuccessMessage(null)}
+                        sx={{ width: '100%' }}
+                    >
+                        {successMessage}
                     </Alert>
                 </Snackbar>
             </Container>

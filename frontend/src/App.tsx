@@ -3,9 +3,12 @@ import Dashboard from "./components/Dashboard";
 import RoomDetail from "./components/roomDetail";
 import Home from "./components/Home";
 import Billing from "./components/Billing";
+import Profile from "./components/Profile";
 import PrivateRoute from "./components/Auth/PrivateRoute";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/signUp";
+import ResetPassword from "./components/Auth/ResetPassword";
+import OtpVerification from "./components/Auth/OtpVerification";
 
 function App() {
     return (
@@ -17,6 +20,8 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/auth/login" element={<Login/>} />
                         <Route path="/auth/register" element={<Register />} />
+                        <Route path="/auth/reset-password" element={<ResetPassword />} />
+                        <Route path="/auth/verify-otp" element={<OtpVerification email="" purpose="signup" />} />
                         
                         {/* Protected Routes */}
                         <Route
@@ -40,6 +45,14 @@ function App() {
                             element={
                                 <PrivateRoute>
                                     <Billing />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/profile"
+                            element={
+                                <PrivateRoute>
+                                    <Profile />
                                 </PrivateRoute>
                             }
                         />

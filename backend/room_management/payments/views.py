@@ -7,7 +7,7 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Transaction, PaymentIntent
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -134,7 +134,8 @@ class MpesaCallbackView(APIView):
                     description=result_desc,
                     room_name=room_name,  # Store room_name in transaction
                     timestamp=transaction_date,
-                    room_id=room_id
+                    room_id=room_id,
+                    user_id=user_id
                 )
                 
                 # Update room member payment status if payment was successful
@@ -173,8 +174,10 @@ class MpesaCallbackView(APIView):
 
 
 class TransactionListView(ListAPIView):
-    permission_classes = []
-    authentication_classes = []
-    queryset = Transaction.objects.all().order_by('timestamp')
     serializer_class = TransactionSerializer
-    
+    def get_queryset(self):   
+        try:
+            user_id = self.request.user.id
+            return Transaction.objects.filter(user_id=user_id).order_by('-timestamp')
+        except Exception as e:
+                raise(e)

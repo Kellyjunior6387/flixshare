@@ -14,9 +14,11 @@ import {
     Fade,
     ThemeProvider,
     LinearProgress,
-    CssBaseline
+    CssBaseline,
+    Divider,
+    Grid
 } from '@mui/material';
-import { Visibility, VisibilityOff, Email, Lock, Person, Phone } from '@mui/icons-material';
+import { Visibility, VisibilityOff, Email, Lock, Person, Phone, Google, GitHub } from '@mui/icons-material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import authTheme from '../../theme/authTheme';
@@ -53,9 +55,14 @@ const Register: React.FC = () => {
             );
             console.log(response);
             setSuccess(true);
-            // Redirect to login page after 2 seconds
+            // Redirect to OTP verification page
             setTimeout(() => {
-                navigate('/auth/login');
+                navigate('/auth/verify-otp', { 
+                    state: { 
+                        email: formData.email,
+                        purpose: 'signup'
+                    } 
+                });
             }, 2000);
 
         } catch (error) {
@@ -71,6 +78,12 @@ const Register: React.FC = () => {
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
+    };
+
+    const handleOAuthSignUp = async (providerId: string) => {
+        // OAuth functionality will be implemented later
+        console.log(`${providerId} OAuth sign up - to be implemented`);
+        setError(`${providerId} OAuth sign up will be available soon`);
     };
 
     const getPasswordStrength = (password: string) => {
@@ -315,7 +328,7 @@ const Register: React.FC = () => {
                                         variant="contained"
                                         disabled={isLoading}
                                         sx={{ 
-                                            mb: 3,
+                                            mb: 2,
                                             py: 1.5,
                                             fontSize: '1rem',
                                             position: 'relative',
@@ -324,6 +337,73 @@ const Register: React.FC = () => {
                                     >
                                         {isLoading ? 'Creating Account...' : 'Create Account'}
                                     </Button>
+
+                                    {/* OAuth Divider */}
+                                    <Box sx={{ my: 3 }}>
+                                        <Divider sx={{ 
+                                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                                            '&::before, &::after': {
+                                                borderColor: 'rgba(255, 255, 255, 0.1)',
+                                            }
+                                        }}>
+                                            <Typography 
+                                                variant="body2" 
+                                                sx={{ 
+                                                    color: 'text.secondary',
+                                                    px: 2,
+                                                    fontSize: '0.85rem'
+                                                }}
+                                            >
+                                                Or continue with
+                                            </Typography>
+                                        </Divider>
+                                    </Box>
+
+                                    {/* OAuth Buttons */}
+                                    <Grid container spacing={2} sx={{ mb: 3 }}>
+                                        <Grid item xs={6}>
+                                            <Button
+                                                fullWidth
+                                                variant="outlined"
+                                                onClick={() => handleOAuthSignUp('google')}
+                                                disabled={isLoading}
+                                                startIcon={<Google />}
+                                                sx={{
+                                                    py: 1.2,
+                                                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                                                    color: 'text.primary',
+                                                    '&:hover': {
+                                                        borderColor: '#db4437',
+                                                        background: 'rgba(219, 68, 55, 0.1)',
+                                                        color: '#db4437',
+                                                    },
+                                                }}
+                                            >
+                                                Google
+                                            </Button>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Button
+                                                fullWidth
+                                                variant="outlined"
+                                                onClick={() => handleOAuthSignUp('github')}
+                                                disabled={isLoading}
+                                                startIcon={<GitHub />}
+                                                sx={{
+                                                    py: 1.2,
+                                                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                                                    color: 'text.primary',
+                                                    '&:hover': {
+                                                        borderColor: '#333',
+                                                        background: 'rgba(51, 51, 51, 0.1)',
+                                                        color: '#333',
+                                                    },
+                                                }}
+                                            >
+                                                GitHub
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
 
                                     <Box sx={{ textAlign: 'center' }}>
                                         <Typography 
@@ -379,7 +459,7 @@ const Register: React.FC = () => {
                         severity="success"
                         sx={{ width: '100%' }}
                     >
-                        Registration successful! Redirecting to login...
+                        Registration successful! Please check your email for verification.
                     </Alert>
                 </Snackbar>
             </Container>

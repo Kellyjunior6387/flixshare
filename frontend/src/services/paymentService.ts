@@ -28,10 +28,15 @@ export interface MpesaPaymentResponse {
 }
 
 class PaymentService {
-  // Get all transactions
+  // Get all transactions (filtered by current user)
   async getTransactions(): Promise<Transaction[]> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/payments/transactions/`);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_BASE_URL}/payments/transactions/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching transactions:', error);
@@ -60,15 +65,19 @@ class PaymentService {
     }
   }
 
-  // Get user transactions (could be filtered by user ID if needed)
+  // Get user transactions (with proper authentication)
   async getUserTransactions(): Promise<Transaction[]> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/payments/transactions/`);
-      const transactions = response.data;
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_BASE_URL}/payments/transactions/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
-      // If we need to filter by user, we'd need to add user info to transactions
-      // For now, return all transactions
-      return transactions;
+      // The backend should already filter by user based on the token
+      // but we can add additional client-side filtering if needed
+      return response.data;
     } catch (error) {
       console.error('Error fetching user transactions:', error);
       throw error;
