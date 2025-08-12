@@ -4,15 +4,16 @@ from supertokens_python import (
     InputAppInfo,
     SupertokensConfig,
 )
+import os
 
 # this is the location of the SuperTokens core.
 supertokens_config = SupertokensConfig(
-    connection_uri="http://localhost:3567/")
+    connection_uri=os.getenv("SUPERTOKENS_URL", "http://localhost:3567/"))
 
 app_info = InputAppInfo(
     app_name="Supertokens",
-    api_domain="http://localhost:8080",
-    website_domain="http://localhost:3000",
+    api_domain=os.getenv("ROOM_BACKEND_URL", "http://localhost:8080"),
+    website_domain=os.getenv("WEBSITE_URL", "http://localhost:3000"),
 )
 
 # recipeList contains all the modules that you want to

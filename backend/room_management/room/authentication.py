@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from uuid import UUID
 import requests
 import logging
+import os
 from .cache_utils import get_user_cache, set_user_cache, is_redis_available
 
 logger = logging.getLogger(__name__)
@@ -37,8 +38,9 @@ class JWTAuthentication(BaseAuthentication):
                         return (user, token)
             
             # If not in cache or Redis is unavailable, fetch from auth service
+            auth_backend_url = os.getenv("AUTH_BACKEND_URL", "http://localhost:8000")
             response = requests.get(
-                'http://localhost:8000/auth/verify/',
+                f'{auth_backend_url}/auth/verify/',
                 headers={'Authorization': f'Bearer {token}'},
                 timeout=10  # Add timeout for security
             )

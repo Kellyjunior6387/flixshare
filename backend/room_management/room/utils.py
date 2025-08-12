@@ -1,9 +1,11 @@
 import requests
+import os
 
 def get_owner_username(owner_id, token):
         try:
+            auth_backend_url = os.getenv("AUTH_BACKEND_URL", "http://localhost:8000")
             response = requests.get(
-                'http://localhost:8000/auth/info/',
+                f'{auth_backend_url}/auth/info/',
                 headers={
                     'Authorization': f'Bearer {token}',
                 },

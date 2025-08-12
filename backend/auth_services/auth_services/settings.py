@@ -165,7 +165,7 @@ CORS_ORIGIN_WHITELIST = [
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000"
+    os.getenv("WEBSITE_URL", "http://localhost:3000")
 ]
 
 CORS_ALLOW_HEADERS: List[str] = list(default_headers) + [
