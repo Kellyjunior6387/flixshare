@@ -18,6 +18,7 @@ import { Email as EmailIcon, Refresh as RefreshIcon } from '@mui/icons-material'
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import authTheme from '../../theme/authTheme';
+import { getAuthBackendUrl } from '../../config';
 
 interface OtpVerificationProps {
     email: string;
@@ -98,7 +99,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
 
         try {
             await axios.post(
-                'http://localhost:8000/auth/verify-signup-otp/',
+                `${getAuthBackendUrl()}/auth/verify-signup-otp/`,
                 {
                     email: emailToUse,
                     otp: otpCode
@@ -139,7 +140,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
 
         try {
             await axios.post(
-                'http://localhost:8000/auth/send-signup-otp/',
+                `${getAuthBackendUrl()}/auth/send-signup-otp/`,
                 {
                     email: emailToUse
                 }

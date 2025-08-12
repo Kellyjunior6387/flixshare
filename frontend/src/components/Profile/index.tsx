@@ -37,6 +37,7 @@ import theme from '../Dashboard/theme';
 import TopBar from '../shared/TopBar';
 import { useAuth } from '../../utils/auth';
 import axios from 'axios';
+import { getAuthBackendUrl } from '../../config';
 
 const Profile: React.FC = () => {
     const { user, loading: userLoading } = useAuth();
@@ -78,7 +79,7 @@ const Profile: React.FC = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.put(
-                'http://localhost:8000/auth/profile/phone/',
+                `${getAuthBackendUrl()}/auth/profile/phone/`,
                 { phone_number: phoneNumber },
                 {
                     headers: {
@@ -118,7 +119,7 @@ const Profile: React.FC = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.put(
-                'http://localhost:8000/auth/profile/password/',
+                `${getAuthBackendUrl()}/auth/profile/password/`,
                 {
                     current_password: passwordData.currentPassword,
                     new_password: passwordData.newPassword,

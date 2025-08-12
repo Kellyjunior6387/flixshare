@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { getAuthBackendUrl } from '../config';
 
 interface UserInfo {
   user_id: string;
@@ -87,7 +88,7 @@ export const useAuth = () => {
 
       // Make API request if cache miss or bypass requested
       const response = await axios.get(
-        'http://localhost:8000/auth/verify/',
+        `${getAuthBackendUrl()}/auth/verify/`,
         {
           headers: {
             'Authorization': `Bearer ${token}`

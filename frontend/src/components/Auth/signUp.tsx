@@ -22,6 +22,7 @@ import { Visibility, VisibilityOff, Email, Lock, Person, Phone, Google, GitHub }
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import authTheme from '../../theme/authTheme';
+import { getAuthBackendUrl } from '../../config';
 
 const Register: React.FC = () => {
     const navigate = useNavigate();
@@ -50,7 +51,7 @@ const Register: React.FC = () => {
 
         try {
             const response = await axios.post(
-                'http://localhost:8000/auth/register/',
+                `${getAuthBackendUrl()}/auth/register/`,
                 formData
             );
             console.log(response);

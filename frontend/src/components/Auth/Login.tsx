@@ -21,6 +21,7 @@ import { Visibility, VisibilityOff, Email, Lock, Google, GitHub } from '@mui/ico
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import authTheme from '../../theme/authTheme';
+import { getAuthBackendUrl } from '../../config';
 
 const Login: React.FC = () => {
     const navigate = useNavigate();
@@ -55,7 +56,7 @@ const Login: React.FC = () => {
 
         try {
             const response = await axios.post(
-                'http://localhost:8000/auth/login/',
+                `${getAuthBackendUrl()}/auth/login/`,
                 formData
             );
 

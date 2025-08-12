@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { getRoomBackendUrl } from '../config';
 
-const API_BASE_URL = 'http://localhost:8080'; // Room management service
-// const AUTH_API_URL = 'http://localhost:8001'; // Auth service - for future use
+const API_BASE_URL = getRoomBackendUrl(); // Room management service
+// const AUTH_API_URL = getAuthBackendUrl(); // Auth service - for future use
 
 export interface Transaction {
   id: number;

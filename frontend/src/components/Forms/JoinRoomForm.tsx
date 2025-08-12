@@ -20,6 +20,7 @@ import {
   QrCode as QrCodeIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
+import { getRoomBackendUrl } from '../../config';
 
 interface JoinRoomFormProps {
   open: boolean;
@@ -46,7 +47,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({ open, onClose, onJoinSucces
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:8080/room/join/',
+        `${getRoomBackendUrl()}/room/join/`,
         { room_id: roomId.trim() },
         {
           headers: {

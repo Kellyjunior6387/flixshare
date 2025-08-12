@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { getRoomBackendUrl } from '../../config';
 export interface Room {
     id: string;
     name: string;
@@ -22,7 +23,7 @@ export const useRooms = () => {
     const fetchRooms = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:8080/room/list/', {
+            const response = await axios.get(`${getRoomBackendUrl()}/room/list/`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
