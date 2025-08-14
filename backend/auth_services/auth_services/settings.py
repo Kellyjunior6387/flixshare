@@ -11,18 +11,18 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from supertokens_python import init, InputAppInfo, SupertokensConfig
-from supertokens_python.recipe import emailpassword, session
 from supertokens_python import get_all_cors_headers
 from typing import List
 from auth_services.config import supertokens_config, app_info, recipe_list
 from corsheaders.defaults import default_headers
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+#Load the .env files
+load_dotenv()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -30,9 +30,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-)_9-#n8xgptp1wzxyrw-=b2&_c-ih@7k^yr9q6_y+sndy^_#yf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    os.getenv("FRONTEND_WEBSITE_URL", "http://localhost:3000"),
+]
 
 
 # Application definition
@@ -149,23 +151,16 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-init(
-    supertokens_config=supertokens_config,
-    app_info=app_info,
-    framework="django",
-    recipe_list=recipe_list,
-    mode='wsgi'
-)
 
 
 CORS_ORIGIN_WHITELIST = [
-    "http://127.0.0.1:3000"
+    os.getenv("FRONTEND_WEBSITE_URL", "http://localhost:3000")
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    os.getenv("WEBSITE_URL", "http://localhost:3000")
+    os.getenv("FRONTEND_WEBSITE_URL", "http://localhost:3000")
 ]
 
 CORS_ALLOW_HEADERS: List[str] = list(default_headers) + [
