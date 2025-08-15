@@ -14,6 +14,7 @@ class RegisterView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
     def post(self, request):
+        print('fuck')
         username = request.data.get('username')
         email = request.data.get("email")
         password = request.data.get("password")
