@@ -1,10 +1,19 @@
 FROM ubuntu:22.04
 
+# Prevent tzdata from asking for user input
+ENV DEBIAN_FRONTEND=noninteractive
+
+
 # Install Python and dependencies
 RUN apt-get update && apt-get install -y \
     python3 python3-pip python3-venv python3-dev \
     curl gnupg2 unixodbc-dev \
+    tzdata \
     && rm -rf /var/lib/apt/lists/*
+
+# Set timezone
+ENV TZ=UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install Microsoft ODBC Driver for SQL Server
 RUN curl -sSL -O https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb \

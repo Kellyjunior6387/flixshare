@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (
     RegisterView, LoginView, TestJWT, VerifyUser, UserInfo, UserByPhoneView, 
     UpdatePhoneNumberView, UpdatePasswordView, SendSignupOTPView, VerifySignupOTPView,
-    SendResetOTPView, VerifyResetOTPView, ResetPasswordView, GithubLoginView, GoogleLoginView
+    SendResetOTPView, VerifyResetOTPView, ResetPasswordView, GithubLoginView, GoogleLoginView,
+    HealthyView
 )
 
 urlpatterns = [
@@ -25,4 +26,7 @@ urlpatterns = [
     #OAUTH endpoints
     path('google/login/', GoogleLoginView.as_view(), name='google-login'),
     path('github/login/', GithubLoginView.as_view(), name='github-login'),
+
+    #Healthy checkup
+    path('health/', HealthyView.as_view(), name='health-checkup')
 ]  

@@ -8,6 +8,9 @@ import requests
 import logging
 import os
 from .cache_utils import get_user_cache, set_user_cache, is_redis_available
+from .utils import ServiceClient
+from .utils import ServiceConfig
+
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +41,7 @@ class JWTAuthentication(BaseAuthentication):
                         return (user, token)
             
             # If not in cache or Redis is unavailable, fetch from auth service
-            auth_backend_url = os.getenv("AUTH_BACKEND_URL", "http://localhost:8000")
+            auth_backend_url = os.getenv("AUTH_BACKEND_URL", "http://auth_service:8000")
             response = requests.get(
                 f'{auth_backend_url}/auth/verify/',
                 headers={'Authorization': f'Bearer {token}'},
