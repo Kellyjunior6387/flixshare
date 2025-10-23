@@ -14,6 +14,7 @@ class RegisterView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
     def post(self, request):
+        print('fuck')
         username = request.data.get('username')
         email = request.data.get("email")
         password = request.data.get("password")
@@ -334,3 +335,9 @@ class GithubLoginView(APIView):
             redirect_uri=f"{API_URL}/auth/github/callback"
         )
         return Response ({'auth_url': url}, status=status.HTTP_200_OK)
+
+class HealthyView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    def get(self, request):
+        return Response({'status':'healthy'})

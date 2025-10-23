@@ -11,18 +11,17 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from supertokens_python import init, InputAppInfo, SupertokensConfig
-from supertokens_python.recipe import emailpassword, session
 from supertokens_python import get_all_cors_headers
 from typing import List
-from auth_services.config import supertokens_config, app_info, recipe_list
 from corsheaders.defaults import default_headers
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+#Load the .env files
+load_dotenv()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -30,10 +29,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-)_9-#n8xgptp1wzxyrw-=b2&_c-ih@7k^yr9q6_y+sndy^_#yf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
 
 # Application definition
 
@@ -45,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'supertokens_python',
     'rest_framework',
     'corsheaders',
     
@@ -61,7 +58,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'supertokens_python.framework.django.django_middleware.middleware',
 ]
 
 ROOT_URLCONF = 'auth_services.urls'
@@ -91,8 +87,17 @@ AUTH_USER_MODEL = 'auth_model.User'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'mssql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
+        'OPTIONS': {
+            'driver': 'ODBC Driver 18 for SQL Server',
+            'Encrypt': True,
+            'TrustServerCertificate': False,
+        },
     }
 }
 
@@ -149,28 +154,21 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-init(
-    supertokens_config=supertokens_config,
-    app_info=app_info,
-    framework="django",
-    recipe_list=recipe_list,
-    mode='wsgi'
-)
 
 
 CORS_ORIGIN_WHITELIST = [
-    "http://127.0.0.1:3000"
+    os.getenv("FRONTEND_WEBSITE_URL", "http://localhost:3000")
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000"
+    os.getenv("FRONTEND_WEBSITE_URL", "http://localhost:3000")
 ]
 
 CORS_ALLOW_HEADERS: List[str] = list(default_headers) + [
     "Content-Type"
-] + get_all_cors_headers()
+]
 
 #EMAILS CONFIG
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

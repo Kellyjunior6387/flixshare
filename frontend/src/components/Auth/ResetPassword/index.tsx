@@ -30,6 +30,7 @@ import {
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import authTheme from '../../../theme/authTheme';
+import { getAuthBackendUrl } from '../../../config';
 
 const ResetPassword: React.FC = () => {
     const navigate = useNavigate();
@@ -52,7 +53,7 @@ const ResetPassword: React.FC = () => {
         setIsLoading(true);
 
         try {
-            await axios.post('http://localhost:8000/auth/send-reset-otp/', {
+            await axios.post(`${getAuthBackendUrl()}/auth/send-reset-otp/`, {
                 email: email,
             });
             
@@ -75,7 +76,7 @@ const ResetPassword: React.FC = () => {
         setIsLoading(true);
 
         try {
-            await axios.post('http://localhost:8000/auth/verify-reset-otp/', {
+            await axios.post(`${getAuthBackendUrl()}/auth/verify-reset-otp/`, {
                 email: email,
                 otp: otp,
             });
@@ -110,7 +111,7 @@ const ResetPassword: React.FC = () => {
         setIsLoading(true);
 
         try {
-            await axios.post('http://localhost:8000/auth/reset-password/', {
+            await axios.post(`${getAuthBackendUrl()}/auth/reset-password/`, {
                 email: email,
                 otp: otp,
                 new_password: newPassword,
@@ -136,7 +137,7 @@ const ResetPassword: React.FC = () => {
         setIsLoading(true);
 
         try {
-            await axios.post('http://localhost:8000/auth/send-reset-otp/', {
+            await axios.post(`${getAuthBackendUrl()}/auth/send-reset-otp/`, {
                 email: email,
             });
             

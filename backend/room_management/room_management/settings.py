@@ -12,16 +12,17 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from supertokens_python import init
-from room_management.config import app_info, recipe_list, supertokens_config
 from corsheaders.defaults import default_headers
 from supertokens_python import get_all_cors_headers
 from typing import List
-from supertokens_python.framework.django import middleware
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+#Load environment from .env files
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -30,12 +31,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-)_9-#n8xgptp1wzxyrw-=b2&_c-ih@7k^yr9q6_y+sndy^_#yf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '250816466716.ngrok-free.app',
-    '127.0.0.1'
+ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS'),
 ]
 
 
@@ -63,7 +61,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "supertokens_python.framework.django.middleware",
 ]
 
 ROOT_URLCONF = 'room_management.urls'
@@ -92,8 +89,17 @@ WSGI_APPLICATION = 'room_management.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'mssql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
+        'OPTIONS': {
+            'driver': 'ODBC Driver 18 for SQL Server',
+            'Encrypt': True,
+            'TrustServerCertificate': False,
+        },
     }
 }
 
@@ -140,22 +146,15 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-init(
-    supertokens_config=supertokens_config,
-    app_info=app_info,
-    framework="django",
-    recipe_list=recipe_list,
-    mode='wsgi'
-)
 
 CORS_ORIGIN_WHITELIST = [
-    "http://127.0.0.1:3000"
+    os.getenv("FRONTEND_WEBSITE_URL", "http://localhost:3000")
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000"
+    os.getenv("FRONTEND_WEBSITE_URL", "http://localhost:3000")
 ]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -173,8 +172,8 @@ MPESA_PASSKEY = os.getenv("MPESA_PASSKEY")
 MPESA_CALLBACK_URL = os.getenv("MPESA_CALLBACK_URL").strip()
 
 #REDIS SETTINGS
-REDIS_HOST = 'localhost'
-REDIS_PORT = 6379
-REDIS_DB = 0
+REDIS_HOST = os.getenv('REDIS_HOST')
+REDIS_PORT = os.getenv("REDIS_PORT")
+REDIS_DB = os.getenv("REDIS_DB")
 
 

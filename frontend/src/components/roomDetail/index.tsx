@@ -47,6 +47,7 @@ import { RoomDetailData } from './types';
 import axios from 'axios';
 import authTheme from '../../theme/authTheme';
 import TopBar from '../shared/TopBar';
+import { getRoomBackendUrl } from '../../config';
 
 const RoomDetail: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -68,7 +69,7 @@ const RoomDetail: React.FC = () => {
       try {
         const token = localStorage.getItem('token');
         const response = await axios.get(
-          `http://localhost:8080/room/${roomId}/`,
+          `${getRoomBackendUrl()}/room/${roomId}/`,
           {
             headers: {
               'Authorization': `Bearer ${token}`
@@ -96,7 +97,7 @@ const RoomDetail: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        `http://localhost:8080/room/${roomId}/leave/`,
+        `${getRoomBackendUrl()}/room/${roomId}/leave/`,
         {},
         {
           headers: {
@@ -123,7 +124,7 @@ const RoomDetail: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.delete(
-        `http://localhost:8080/room/${roomId}/delete/`,
+        `${getRoomBackendUrl()}/room/${roomId}/delete/`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -151,7 +152,7 @@ const RoomDetail: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        `http://localhost:8080/room/${roomId}/remove-member/`,
+        `${getRoomBackendUrl()}/room/${roomId}/remove-member/`,
         { member_user_id: memberToRemove.user_id },
         {
           headers: {
@@ -192,7 +193,7 @@ const RoomDetail: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        `http://localhost:8080/room/${roomId}/`,
+        `${getRoomBackendUrl()}/room/${roomId}/`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
